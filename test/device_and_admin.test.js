@@ -6,8 +6,8 @@ const db = require('../src/config/db');
 
 // Multi-device test fixture
 const mockDevices = [
-  { id: 1, name: 'ROOM_1', secret_key: 'key_room1_secret_abc', location: 'Design Studio 101', last_seen_at: null },
-  { id: 2, name: 'ROOM_2', secret_key: 'key_room2_secret_xyz', location: 'Hardware Bay 202', last_seen_at: null },
+  { id: 1, name: 'ROOM_1', location: 'Design Studio 101', last_seen_at: null },
+  { id: 2, name: 'ROOM_2', location: 'Hardware Bay 202', last_seen_at: null },
 ];
 
 const mockLogs = [];
@@ -21,16 +21,17 @@ const mockCommands = [];
 db.query = async (text, params = []) => {
   const queryStr = text.trim();
 
-  // Multi-device device authentication (dir + key match)
-  if (queryStr.includes('FROM devices WHERE name = $1 AND secret_key = $2')) {
-    const dev = mockDevices.find((d) => d.name === params[0] && d.secret_key === params[1]);
+  // Multi-device device authentication (dir match or auto-create)
+  if (queryStr.includes('FROM devices WHERE name = $1')) {
+    const dev = mockDevices.find((d) => d.name === params[0]);
     return { rows: dev ? [dev] : [] };
   }
 
-  // Legacy fallback if secret_key alone tested
-  if (queryStr.includes('FROM devices WHERE secret_key = $1')) {
-    const dev = mockDevices.find((d) => d.secret_key === params[0]);
-    return { rows: dev ? [dev] : [] };
+  // Auto-register device
+  if (queryStr.includes('INSERT INTO devices')) {
+    const newDev = { id: mockDevices.length + 1, name: params[0], location: params[1], last_seen_at: new Date() };
+    mockDevices.push(newDev);
+    return { rows: [newDev] };
   }
 
   // Update last_seen_at
@@ -139,30 +140,16 @@ db.query = async (text, params = []) => {
   return { rows: [] };
 };
 
-test('MULTI-DEVICE ISOLATION: Strict dir + key Authentication', async (t) => {
+test('MULTI-DEVICE ROUTING: Room Identifier (dir) Authentication', async (t) => {
   await t.test('rejects request if dir is missing', async () => {
-    const res = await request(app).get('/log?id=17&date=2026-09-15&time=14:32:07&key=key_room1_secret_abc');
-    assert.strictEqual(res.status, 401);
-    assert.strictEqual(res.text.includes('Missing room name (dir)'), true);
+    const res = await request(app).get('/log?id=17&date=2026-09-15&time=14:32:07');
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(res.text.includes('Missing room identifier'), true);
   });
 
-  await t.test('rejects request if key is missing', async () => {
-    const res = await request(app).get('/log?id=17&date=2026-09-15&time=14:32:07&dir=ROOM_1');
-    assert.strictEqual(res.status, 401);
-    assert.strictEqual(res.text.includes('Missing room name (dir) or device key (key)'), true);
-  });
-
-  await t.test('rejects cross-room mismatch (ROOM_1 dir with ROOM_2 key)', async () => {
-    // Attempting to use ROOM_2's key on ROOM_1
+  await t.test('accepts valid scan for ROOM_1 and records device_id', async () => {
     const res = await request(app)
-      .get('/log?id=17&date=2026-09-15&time=14:32:07&dir=ROOM_1&key=key_room2_secret_xyz');
-    assert.strictEqual(res.status, 401);
-    assert.strictEqual(res.text.includes('mismatch'), true);
-  });
-
-  await t.test('accepts valid scan for ROOM_1 with matching key', async () => {
-    const res = await request(app)
-      .get('/log?id=17&date=2026-09-15&time=14:32:07&dir=ROOM_1&key=key_room1_secret_abc');
+      .get('/log?id=17&date=2026-09-15&time=14:32:07&dir=ROOM_1');
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'OK');
     assert.strictEqual(mockLogs.length, 1);
@@ -170,9 +157,9 @@ test('MULTI-DEVICE ISOLATION: Strict dir + key Authentication', async (t) => {
     assert.strictEqual(mockLogs[0].fingerprint_id, 17);
   });
 
-  await t.test('accepts valid scan for ROOM_2 with matching key and isolates device_id', async () => {
+  await t.test('accepts valid scan for ROOM_2 and isolates device_id', async () => {
     const res = await request(app)
-      .get('/log?id=17&date=2026-09-15&time=14:35:10&dir=ROOM_2&key=key_room2_secret_xyz');
+      .get('/log?id=17&date=2026-09-15&time=14:35:10&dir=ROOM_2');
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'OK');
     assert.strictEqual(mockLogs.length, 2);
@@ -183,11 +170,11 @@ test('MULTI-DEVICE ISOLATION: Strict dir + key Authentication', async (t) => {
 
 test('MULTI-DEVICE ISOLATION: Remote Unlock Polling & Queue Isolation', async (t) => {
   await t.test('both rooms return "false" initially when no unlock is pending', async () => {
-    const r1 = await request(app).get('/check-unlock?dir=ROOM_1&key=key_room1_secret_abc');
+    const r1 = await request(app).get('/check-unlock?dir=ROOM_1');
     assert.strictEqual(r1.status, 200);
     assert.strictEqual(r1.text, 'false');
 
-    const r2 = await request(app).get('/check-unlock?dir=ROOM_2&key=key_room2_secret_xyz');
+    const r2 = await request(app).get('/check-unlock?dir=ROOM_2');
     assert.strictEqual(r2.status, 200);
     assert.strictEqual(r2.text, 'false');
   });
@@ -197,7 +184,7 @@ test('MULTI-DEVICE ISOLATION: Remote Unlock Polling & Queue Isolation', async (t
     mockCommands.push({ id: 201, device_id: 1, status: 'pending', created_at: new Date() });
 
     // ROOM_2 polls check-unlock -> MUST return "false"! (ROOM_1 unlock is untouched)
-    const r2Poll = await request(app).get('/check-unlock?dir=ROOM_2&key=key_room2_secret_xyz');
+    const r2Poll = await request(app).get('/check-unlock?dir=ROOM_2');
     assert.strictEqual(r2Poll.status, 200);
     assert.strictEqual(r2Poll.text, 'false');
     assert.strictEqual(r2Poll.text.indexOf('true'), -1);
@@ -207,16 +194,17 @@ test('MULTI-DEVICE ISOLATION: Remote Unlock Polling & Queue Isolation', async (t
     assert.strictEqual(cmd.status, 'pending');
 
     // ROOM_1 polls check-unlock -> MUST return "true" and consume the command
-    const r1Poll = await request(app).get('/check-unlock?dir=ROOM_1&key=key_room1_secret_abc');
+    const r1Poll = await request(app).get('/check-unlock?dir=ROOM_1');
     assert.strictEqual(r1Poll.status, 200);
     assert.strictEqual(r1Poll.text, 'true');
     assert.strictEqual(r1Poll.text.indexOf('true') >= 0, true);
     assert.strictEqual(cmd.status, 'consumed');
 
     // Immediate second poll by ROOM_1 -> returns "false"
-    const r1NextPoll = await request(app).get('/check-unlock?dir=ROOM_1&key=key_room1_secret_abc');
+    const r1NextPoll = await request(app).get('/check-unlock?dir=ROOM_1');
     assert.strictEqual(r1NextPoll.status, 200);
     assert.strictEqual(r1NextPoll.text, 'false');
     assert.strictEqual(r1NextPoll.text.indexOf('true'), -1);
   });
 });
+

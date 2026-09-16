@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { X, Key, Cpu } from 'lucide-react';
+import { X, Cpu } from 'lucide-react';
 
 export default function DeviceModal({ device, onClose, onSave }) {
   const [name, setName] = useState(device ? device.name : '');
   const [location, setLocation] = useState(device ? device.location || '' : '');
-  const [secretKey, setSecretKey] = useState(device ? device.secret_key : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,7 +21,6 @@ export default function DeviceModal({ device, onClose, onSave }) {
       await onSave({
         name: name.trim().toUpperCase().replace(/\s+/g, '_'),
         location: location.trim(),
-        secret_key: secretKey.trim() || undefined,
       });
       onClose();
     } catch (err) {
@@ -39,7 +37,7 @@ export default function DeviceModal({ device, onClose, onSave }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Cpu size={20} color="var(--accent-cyan)" />
             <h3 style={{ fontSize: 18, fontWeight: 700 }}>
-              {device ? 'Edit Device Room' : 'Register New ESP32 Unit'}
+              {device ? 'Edit Room Unit' : 'Register New Room Unit'}
             </h3>
           </div>
           <button onClick={onClose} className="btn btn-secondary btn-sm" style={{ padding: 6 }}>
@@ -64,22 +62,22 @@ export default function DeviceModal({ device, onClose, onSave }) {
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Room Identifier (ESP32 "dir" parameter)
+              Room Identifier (ESP32 "DIR_NAME")
             </label>
             <input
               type="text"
               className="input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. FUN_LAB, ROBOTICS_BAY, SERVER_RM"
+              placeholder="e.g. CRF_LAB_1, ROOM_1, LAB_202"
               required
             />
             <span style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4, display: 'block' }}>
-              Must match the exact <code>dir=...</code> parameter sent by your ESP32.
+              Must match the exact <code>DIR_NAME</code> set in your ESP32 code.
             </span>
           </div>
 
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 24 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
               Physical Location / Notes
             </label>
@@ -88,31 +86,16 @@ export default function DeviceModal({ device, onClose, onSave }) {
               className="input"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. Building A, Room 204, East Entrance"
+              placeholder="e.g. Ground Floor, Room 101"
             />
           </div>
-
-          {!device && (
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                Custom Secret Key (Optional)
-              </label>
-              <input
-                type="text"
-                className="input"
-                value={secretKey}
-                onChange={(e) => setSecretKey(e.target.value)}
-                placeholder="Leave blank to auto-generate a secure key"
-              />
-            </div>
-          )}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
             </button>
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Saving...' : (device ? 'Update Device' : 'Register Device')}
+              {loading ? 'Saving...' : (device ? 'Update Room' : 'Add Room')}
             </button>
           </div>
         </form>

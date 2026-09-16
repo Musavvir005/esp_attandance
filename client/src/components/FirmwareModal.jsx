@@ -10,16 +10,15 @@ export default function FirmwareModal({ device, onClose }) {
 // Room: ${device.name}
 // ==========================================
 
-const char* BACKEND_BASE_URL = "${origin}";
-const char* DEVICE_SECRET    = "${device.secret_key}";
-const char* ROOM_DIR         = "${device.name}";
+const char* server_url  = "${origin}/log";
+const char* unlock_url  = "${origin}/check-unlock";
+const char* DIR_NAME    = "${device.name}";
 
-// 1) Fingerprint Log URL (on every valid scan):
-// GET \${BACKEND_BASE_URL}/log?id=\${id}&date=\${date}&time=\${time}&dir=\${ROOM_DIR}&key=\${DEVICE_SECRET}
+// 1) Fingerprint Log URL (sent on valid scan):
+// GET \${server_url}?id=17&date=2026-09-15&time=14:32:07&dir=${device.name}
 
-// 2) Remote Unlock Polling URL (every 0.5s - 2.0s):
-// GET \${BACKEND_BASE_URL}/check-unlock?key=\${DEVICE_SECRET}
-// Checks: if (httpPayload.indexOf("true") >= 0) { unlockDoor(); }
+// 2) Remote Unlock Polling URL (polled in loop):
+// GET \${unlock_url}?dir=${device.name}
 `;
 
   const handleCopy = () => {

@@ -49,23 +49,20 @@ router.get('/', async (req, res) => {
  * Register a new device/room
  */
 router.post('/', async (req, res) => {
-  const { name, location, secret_key } = req.body || {};
+  const { name, location } = req.body || {};
 
   if (!name || !name.trim()) {
-    return res.status(400).json({ error: 'Device name (room identifier) is required' });
+    return res.status(400).json({ error: 'Room identifier name is required' });
   }
 
   const cleanName = name.trim().toUpperCase().replace(/\s+/g, '_');
-  const generatedKey = secret_key && secret_key.trim() 
-    ? secret_key.trim() 
-    : 'sec_' + crypto.randomBytes(16).toString('hex');
 
   try {
     const result = await db.query(
-      `INSERT INTO devices (name, secret_key, location)
-       VALUES ($1, $2, $3)
+      `INSERT INTO devices (name, location)
+       VALUES ($1, $2)
        RETURNING *`,
-      [cleanName, generatedKey, location ? location.trim() : null]
+      [cleanName, location ? location.trim() : null]
     );
 
     return res.status(201).json({
@@ -74,7 +71,7 @@ router.post('/', async (req, res) => {
     });
   } catch (err) {
     if (err.code === '23505') {
-      return res.status(409).json({ error: 'A device with this name or secret key already exists' });
+      return res.status(409).json({ error: 'A room with this identifier already exists' });
     }
     console.error('Error creating device:', err);
     return res.status(500).json({ error: 'Failed to create device' });
@@ -115,37 +112,6 @@ router.put('/:id', async (req, res) => {
     }
     console.error('Error updating device:', err);
     return res.status(500).json({ error: 'Failed to update device' });
-  }
-});
-
-/**
- * POST /api/devices/:id/rotate-key
- * Regenerates the secret key for a device
- */
-router.post('/:id/rotate-key', async (req, res) => {
-  const { id } = req.params;
-  const newKey = 'sec_' + crypto.randomBytes(16).toString('hex');
-
-  try {
-    const result = await db.query(
-      `UPDATE devices
-       SET secret_key = $1
-       WHERE id = $2
-       RETURNING *`,
-      [newKey, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Device not found' });
-    }
-
-    return res.json({
-      device: result.rows[0],
-      message: 'Secret key rotated successfully. Remember to update firmware constants!',
-    });
-  } catch (err) {
-    console.error('Error rotating device key:', err);
-    return res.status(500).json({ error: 'Failed to rotate secret key' });
   }
 });
 

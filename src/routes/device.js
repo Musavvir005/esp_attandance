@@ -5,11 +5,11 @@ const deviceAuth = require('../middleware/deviceAuth');
 const { checkUnlockLimiter, logLimiter } = require('../middleware/rateLimit');
 
 /**
- * GET /log?id=17&date=2026-09-15&time=14:32:07&dir=FUN_LAB&key=DEVICE_SECRET
+ * GET /log?id=17&date=2026-09-15&time=14:32:07&dir=FUN_LAB
  * Ingests fingerprint scan event from ESP32.
  */
 router.get('/log', logLimiter, deviceAuth, async (req, res) => {
-  const { id, date, time, dir } = req.query;
+  const { id, date, time } = req.query;
 
   const fingerprintId = parseInt(id, 10);
   if (isNaN(fingerprintId) || fingerprintId < 1) {
@@ -40,11 +40,6 @@ router.get('/log', logLimiter, deviceAuth, async (req, res) => {
       ]
     );
 
-    // If dir is provided and differs from device.name, note it in logs
-    if (dir && dir !== req.device.name) {
-      console.warn(`[Device Warning] Device key ${req.device.id} sent dir='${dir}', expected '${req.device.name}'`);
-    }
-
     return res.status(200).type('text/plain').send('OK');
   } catch (err) {
     console.error('Error recording access log:', err);
@@ -53,7 +48,7 @@ router.get('/log', logLimiter, deviceAuth, async (req, res) => {
 });
 
 /**
- * GET /check-unlock?key=DEVICE_SECRET
+ * GET /check-unlock?dir=FUN_LAB
  * Polled by ESP32 every 0.5s - 2s.
  * Returns literal text "true" if an unlock command is pending (and immediately consumes it),
  * or literal text "false" if no pending unlock command exists.

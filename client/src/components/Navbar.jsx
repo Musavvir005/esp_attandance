@@ -143,8 +143,8 @@ export default function Navbar({
               borderColor: activeTab === 'devices' ? 'var(--border-glow)' : 'transparent',
             }}
           >
-            <Key size={16} />
-            <span>Hardware & Keys</span>
+            <Cpu size={16} />
+            <span>Door Units</span>
           </button>
         </nav>
 

@@ -16,10 +16,9 @@ const char* password = "I0T#2o24L@b";
 // ================= BACKEND =================
 const char* server_url  = "https://esp-attandance.onrender.com/log";
 const char* unlock_url  = "https://esp-attandance.onrender.com/check-unlock";
-const char* DEVICE_KEY  = "PASTE_SECRET_KEY_HERE";  // copy from Admin → Hardware & Keys
 
 // ================= ROOM =================
-// ⚠️  Must match the device NAME registered in the Admin panel (e.g. CRF_LAB_1 or FUN_LAB).
+// ⚠️  Room identifier (e.g. CRF_LAB_1, ROOM_1, etc.)
 const char* DIR_NAME = "CRF_LAB_1";
 
 // ================= PINS =================
@@ -347,7 +346,7 @@ void sendToServer(int id) {
   struct tm* t = localtime(&now);
 
   // Build URL matching backend contract:
-  // GET /log?id=&date=YYYY-MM-DD&time=HH:MM:SS&dir=&key=
+  // GET /log?id=&date=YYYY-MM-DD&time=HH:MM:SS&dir=
   String url = String(server_url) +
     "?id="   + String(id) +
     "&date=" + String(t->tm_year + 1900) + "-" +
@@ -356,8 +355,7 @@ void sendToServer(int id) {
     "&time=" + pad2(t->tm_hour) + ":" +
                pad2(t->tm_min)  + ":" +
                pad2(t->tm_sec) +
-    "&dir="  + String(DIR_NAME) +
-    "&key="  + String(DEVICE_KEY);  // ← authentication
+    "&dir="  + String(DIR_NAME);
 
   HTTPClient http;
   http.begin(url);
@@ -370,7 +368,7 @@ void checkUnlock() {
   if (WiFi.status() != WL_CONNECTED) return;
 
   String url = String(unlock_url) +
-    "?key=" + String(DEVICE_KEY);
+    "?dir=" + String(DIR_NAME);
 
   HTTPClient http;
   http.begin(url);
