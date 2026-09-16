@@ -1,0 +1,32 @@
+{
+  "name": "esp-biometric-attendance",
+  "version": "1.0.0",
+  "description": "Admin web panel & backend for ESP32-based biometric door lock system",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "build:client": "npm --prefix client install && npm --prefix client run build",
+    "build": "npm run build:client",
+    "test": "node --test test/**/*.test.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

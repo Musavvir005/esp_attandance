@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: esp32-biometric-lock-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: esp32-lock-db
+          property: connectionString
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_CHECK_PER_MINUTE
+        value: "180"
+      - key: RATE_LIMIT_LOG_PER_MINUTE
+        value: "60"
+
+databases:
+  - name: esp32-lock-db
+    plan: free
+    databaseName: esp_doorlock
+    user: esp_admin
