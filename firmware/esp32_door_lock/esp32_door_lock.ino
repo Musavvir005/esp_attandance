@@ -14,14 +14,12 @@ const char* ssid = "srmap-iotlab";
 const char* password = "I0T#2o24L@b";
 
 // ================= BACKEND =================
-// ⚠️  Change YOUR_RENDER_APP below to your actual Render app name.
-// ⚠️  Change DEVICE_KEY to the secret_key shown in the Admin > Devices page for this room.
-const char* server_url  = "https://YOUR_RENDER_APP.onrender.com/log";
-const char* unlock_url  = "https://YOUR_RENDER_APP.onrender.com/check-unlock";
-const char* DEVICE_KEY  = "PASTE_SECRET_KEY_HERE";  // copy from Admin → Devices
+const char* server_url  = "https://esp-attandance.onrender.com/log";
+const char* unlock_url  = "https://esp-attandance.onrender.com/check-unlock";
+const char* DEVICE_KEY  = "PASTE_SECRET_KEY_HERE";  // copy from Admin → Hardware & Keys
 
 // ================= ROOM =================
-// ⚠️  Must exactly match the device NAME registered in the Admin panel (all-caps + underscores).
+// ⚠️  Must match the device NAME registered in the Admin panel (e.g. CRF_LAB_1 or FUN_LAB).
 const char* DIR_NAME = "CRF_LAB_1";
 
 // ================= PINS =================
