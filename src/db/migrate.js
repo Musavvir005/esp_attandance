@@ -16,42 +16,7 @@ async function runMigrations() {
     await db.query(sql);
     console.log('✓ Database schema successfully applied.');
 
-    // Seed default devices if empty
-    const deviceCheck = await db.query('SELECT COUNT(*) as count FROM devices');
-    if (parseInt(deviceCheck.rows[0].count, 10) === 0) {
-      console.log('Seeding initial devices for multi-room testing (ROOM_1, ROOM_2, FUN_LAB)...');
-      
-      const r1 = await db.query(
-        'INSERT INTO devices (name, secret_key, location) VALUES ($1, $2, $3) RETURNING *',
-        ['ROOM_1', 'dev_secret_room1_12345', 'Design Studio 101']
-      );
 
-      const r2 = await db.query(
-        'INSERT INTO devices (name, secret_key, location) VALUES ($1, $2, $3) RETURNING *',
-        ['ROOM_2', 'dev_secret_room2_67890', 'Hardware Robotics Bay 202']
-      );
-
-      const r3 = await db.query(
-        'INSERT INTO devices (name, secret_key, location) VALUES ($1, $2, $3) RETURNING *',
-        ['FUN_LAB', 'dev_secret_funlab_99999', 'Creative Tech Lounge']
-      );
-
-      // Seed sample users per room (fingerprint_id #17 scoped per device)
-      await db.query(
-        'INSERT INTO users (fingerprint_id, device_id, name, role, active) VALUES ($1, $2, $3, $4, $5)',
-        [17, r1.rows[0].id, 'Alice (Lead Designer)', 'admin', true]
-      );
-      await db.query(
-        'INSERT INTO users (fingerprint_id, device_id, name, role, active) VALUES ($1, $2, $3, $4, $5)',
-        [42, r1.rows[0].id, 'Jane Smith (Architect)', 'member', true]
-      );
-      await db.query(
-        'INSERT INTO users (fingerprint_id, device_id, name, role, active) VALUES ($1, $2, $3, $4, $5)',
-        [17, r2.rows[0].id, 'Bob (Robotics Tech)', 'admin', true]
-      );
-
-      console.log('✓ Seeded ROOM_1, ROOM_2, FUN_LAB with isolated secret keys and users.');
-    }
 
     // Confirm all 4 tables exist in information_schema
     const tablesRes = await db.query(`
