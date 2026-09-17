@@ -14,6 +14,15 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 
+// Helper to get local YYYY-MM-DD
+const getTodayDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function Logs({ selectedRoomId = '', onSelectRoom }) {
   const dateInputRef = useRef(null);
   const [logs, setLogs] = useState([]);
@@ -31,7 +40,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
   }, [selectedRoomId]);
   const [search, setSearch] = useState('');
   const [fingerprintId, setFingerprintId] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(getTodayDateString());
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -237,7 +246,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                 />
               </div>
 
-              {selectedDate && (
+              {selectedDate ? (
                 <button
                   type="button"
                   onClick={(e) => {
@@ -246,10 +255,24 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                     setPage(1);
                   }}
                   className="btn btn-secondary btn-sm"
-                  title="Clear date filter to show all dates"
+                  title="Show logs from all dates"
                   style={{ padding: '9px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
                 >
                   All Dates
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDate(getTodayDateString());
+                    setPage(1);
+                  }}
+                  className="btn btn-secondary btn-sm"
+                  title="Filter to today only"
+                  style={{ padding: '9px 12px', fontSize: 12, whiteSpace: 'nowrap', color: 'var(--accent-cyan)', borderColor: 'var(--accent-cyan)' }}
+                >
+                  Today
                 </button>
               )}
             </div>
@@ -270,31 +293,36 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
           <table>
             <thead>
               <tr>
-                <th>Timestamp</th>
+                <th>Date</th>
+                <th>Time</th>
                 <th>Room Unit ("dir")</th>
                 <th>Enrolled User</th>
                 <th>Fingerprint Slot</th>
                 <th>Access Privilege</th>
-                <th>Raw Device Sync</th>
               </tr>
             </thead>
             <tbody>
               {logs.map((log) => {
                 const isRegistered = Boolean(log.user_name);
+                const logDate = log.raw_date || new Date(log.timestamp).toLocaleDateString();
+                const logTime = log.raw_time || new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
                 return (
                   <tr key={log.id}>
                     <td>
                       <div style={{ fontWeight: 600, color: '#fff' }}>
-                        {new Date(log.timestamp).toLocaleDateString()}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>
-                        {new Date(log.timestamp).toLocaleTimeString()}
+                        {logDate}
                       </div>
                     </td>
 
                     <td>
-                      <div style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--accent-cyan)', fontWeight: 600 }}>
+                        {logTime}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div style={{ fontWeight: 700, color: '#fff' }}>
                         {log.device_name || `Device #${log.device_id}`}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>
@@ -332,12 +360,6 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                         <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>Visitor / Unknown</span>
                       )}
                     </td>
-
-                    <td>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
-                        {log.raw_date || '-'} {log.raw_time || ''}
-                      </span>
-                    </td>
                   </tr>
                 );
               })}
@@ -345,7 +367,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
               {logs.length === 0 && !loading && (
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: 48, color: 'var(--text-dim)' }}>
-                    No access log events match your filter criteria.
+                    No access log events match your filter criteria for {selectedDate || 'all dates'}.
                   </td>
                 </tr>
               )}

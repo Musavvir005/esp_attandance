@@ -21,12 +21,15 @@ async function deviceAuth(req, res, next) {
     );
 
     if (result.rows.length === 0) {
+      const crypto = require('crypto');
+      const generatedSecret = `dev_key_${cleanDir.toLowerCase()}_${crypto.randomBytes(6).toString('hex')}`;
+
       result = await db.query(
-        `INSERT INTO devices (name, location)
-         VALUES ($1, $2)
+        `INSERT INTO devices (name, secret_key, location)
+         VALUES ($1, $2, $3)
          ON CONFLICT (name) DO UPDATE SET last_seen_at = NOW()
          RETURNING id, name, location`,
-        [cleanDir, 'Auto-Registered Unit']
+        [cleanDir, generatedSecret, 'Auto-Registered Unit']
       );
     }
 

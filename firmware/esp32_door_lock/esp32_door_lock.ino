@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Adafruit_Fingerprint.h>
 #include <HardwareSerial.h>
@@ -20,6 +21,10 @@ const char* unlock_url  = "https://esp-attandance.onrender.com/check-unlock";
 // ================= ROOM =================
 // ⚠️  Room identifier (e.g. CRF_LAB_1, ROOM_1, etc.)
 const char* DIR_NAME = "CRF_LAB_1";
+
+// ================= TIMING =================
+unsigned long lastUnlockCheck = 0;
+const unsigned long unlockInterval = 2000;   // check server every 2 sec instead of every loop
 
 // ================= PINS =================
 #define FP_RX 25
@@ -69,9 +74,22 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED);
 
   displayMessage("WiFi Connected", "", 1000);
+  Serial.println("[WiFi] Connected! IP: " + WiFi.localIP().toString());
 
   configTime(19800, 0, "pool.ntp.org");
-  while (time(nullptr) < 100000);
+  Serial.print("[NTP] Synchronizing time");
+  int ntpRetries = 0;
+  while (time(nullptr) < 100000 && ntpRetries < 25) {
+    delay(200);
+    Serial.print(".");
+    ntpRetries++;
+  }
+  Serial.println();
+  if (time(nullptr) < 100000) {
+    Serial.println("[NTP] Time sync timed out (firewall may block UDP 123). Server will timestamp logs.");
+  } else {
+    Serial.println("[NTP] Time synchronized successfully!");
+  }
 
   fpSerial.begin(57600, SERIAL_8N1, FP_RX, FP_TX);
   finger.begin(57600);
@@ -97,8 +115,11 @@ void loop() {
     return;
   }
 
-  // 🌐 REMOTE UNLOCK (poll backend every loop iteration)
-  checkUnlock();
+  // 🌐 REMOTE UNLOCK (poll backend every 2 sec, not every loop)
+  if (millis() - lastUnlockCheck >= unlockInterval) {
+    lastUnlockCheck = millis();
+    checkUnlock();
+  }
 
   if (finger.getImage() != FINGERPRINT_OK) return;
   if (finger.image2Tz() != FINGERPRINT_OK) return;
@@ -107,10 +128,12 @@ void loop() {
   if (finger.fingerSearch() == FINGERPRINT_OK) {
 
     int id = finger.fingerID;
+    Serial.printf("\n[SCAN] Matched Fingerprint Slot #%d (Confidence: %d)\n", id, finger.confidence);
     displayMessage("ID FOUND", String(id).c_str(), 1500);   // ← shows the matched ID
 
     // ===== ADMIN =====
     if (isAdmin(id)) {
+      Serial.printf("[SCAN] Slot #%d is an ADMIN ID -> Entering Enroll Mode (Not logged as normal entry)\n", id);
       beepOnce(400);
       displayMessage("ADMIN MODE", ("ID: " + String(id)).c_str());   // ← shows which admin ID triggered it
       delay(3000);
@@ -340,7 +363,10 @@ static String pad2(int v) {
 }
 
 void sendToServer(int id) {
-  if (WiFi.status() != WL_CONNECTED) return;
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("[HTTP] Cannot send log: WiFi not connected!");
+    return;
+  }
 
   time_t now = time(nullptr);
   struct tm* t = localtime(&now);
@@ -357,9 +383,24 @@ void sendToServer(int id) {
                pad2(t->tm_sec) +
     "&dir="  + String(DIR_NAME);
 
+  Serial.println("[HTTP] Sending scan log to server...");
+  Serial.println("[HTTP] GET: " + url);
+
+  WiFiClientSecure client;
+  client.setInsecure();  // Bypasses SSL certificate verification for Render HTTPS
+
   HTTPClient http;
-  http.begin(url);
-  http.GET();
+  http.begin(client, url);
+  http.setTimeout(4000);
+  int code = http.GET();
+
+  if (code > 0) {
+    Serial.printf("[HTTP] Scan recorded! HTTP Status: %d\n", code);
+    String resp = http.getString();
+    Serial.println("[HTTP] Response: " + resp);
+  } else {
+    Serial.printf("[HTTP] Upload failed: %s (code %d)\n", http.errorToString(code).c_str(), code);
+  }
   http.end();
 }
 
@@ -370,8 +411,12 @@ void checkUnlock() {
   String url = String(unlock_url) +
     "?dir=" + String(DIR_NAME);
 
+  WiFiClientSecure client;
+  client.setInsecure();  // Bypasses SSL certificate verification for Render HTTPS
+
   HTTPClient http;
-  http.begin(url);
+  http.begin(client, url);
+  http.setTimeout(1500);
   int code = http.GET();
 
   if (code == 200) {
@@ -379,6 +424,7 @@ void checkUnlock() {
     body.trim();
     if (body == "true") {
       // Remote unlock requested from admin dashboard
+      Serial.println("[REMOTE] Unlock signal received from website!");
       beepThrice(100, 100, 100);
       displayMessage("REMOTE", "UNLOCK", 500);
       unlockDoor(5000);
