@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { X, Fingerprint, UserCheck } from 'lucide-react';
 
-export default function UserModal({ user, devices, onClose, onSave }) {
-  const [fingerprintId, setFingerprintId] = useState(user ? user.fingerprint_id : '');
-  const [deviceId, setDeviceId] = useState(user ? user.device_id : (devices[0]?.id || ''));
-  const [name, setName] = useState(user ? user.name : '');
-  const [role, setRole] = useState(user ? user.role : 'member');
-  const [active, setActive] = useState(user !== undefined ? user.active : true);
+export default function UserModal({ user, devices = [], onClose, onSave }) {
+  const [fingerprintId, setFingerprintId] = useState(user?.fingerprint_id ?? '');
+  const [deviceId, setDeviceId] = useState(user?.device_id ?? (devices[0]?.id || ''));
+  const [name, setName] = useState(user?.name ?? '');
+  const [role, setRole] = useState(user?.role ?? 'member');
+  const [active, setActive] = useState(user?.active ?? true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

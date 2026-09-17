@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users as UsersIcon, 
   UserPlus, 
@@ -53,7 +53,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
   // Format enrolled date + time with seconds
   const formatEnrolled = (dateStr) => {
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return { date: 'â€”', time: '' };
+    if (isNaN(d.getTime())) return { date: '-', time: '' };
     const date = d.toLocaleDateString('en-GB'); // DD/MM/YYYY
     const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     return { date, time };
@@ -69,10 +69,10 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
             Biometric User Directory
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            Map sensor hardware fingerprint IDs (1â€“127) to human identities and permissions.
+            Map sensor hardware fingerprint IDs (1-127) to human identities and permissions.
             <br />
             <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>
-              ðŸ’¡ Click any row to edit that person's name, role or ID. The ESP32 only sends a slot number â€” you assign the name here.
+              Click any row to edit that person's name, role or ID. The ESP32 only sends a slot number - you assign the name here.
             </span>
           </p>
         </div>
