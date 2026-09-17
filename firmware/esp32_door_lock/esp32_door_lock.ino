@@ -133,28 +133,25 @@ void loop() {
 
     // ===== ADMIN =====
     if (isAdmin(id)) {
-      Serial.printf("[SCAN] Slot #%d is an ADMIN ID -> Entering Enroll Mode (Not logged as normal entry)\n", id);
+      Serial.printf("[SCAN] Slot #%d is an ADMIN ID -> Entering Enroll Mode (10s timeout)\n", id);
       beepOnce(400);
-      displayMessage("ADMIN MODE", ("ID: " + String(id)).c_str());   // ← shows which admin ID triggered it
-      delay(3000);
-      delay(3000);   
+      displayMessage("ADMIN MODE", ("ID: " + String(id)).c_str(), 1500);
+
       int newID = findNextAvailableID();
-
-      // int newID = findNextAvailableID();
-
       if (newID < 0) {
         displayMessage("MEMORY FULL", "", 2000);
+        displayMessage("READY", "SCAN FINGER");
         return;
       }
 
-      displayMessage("ENROLL ID", String(newID).c_str());
+      displayMessage("ENROLL ID", String(newID).c_str(), 1000);
 
       if (scanAndEnroll(newID)) {
-        beepThrice(100,100,100);
-        displayMessage("SUCCESS", "", 2000);
+        beepThrice(100, 100, 100);
+        displayMessage("ENROLLED OK", ("ID: " + String(newID)).c_str(), 2000);
       } else {
-        beepTwice(150,150);
-        displayMessage("FAILED", "", 2000);
+        beepTwice(150, 150);
+        displayMessage("EXIT ADMIN", "TIMEOUT / CANCEL", 2000);
       }
 
       displayMessage("READY", "SCAN FINGER");
@@ -284,24 +281,50 @@ int findNextAvailableID() {
 // ... (rest stays exactly as you have it)
 
 bool scanAndEnroll(int id) {
-  int p = -1;
+  const unsigned long timeoutMs = 10000; // 10 second timeout
+  unsigned long startTime = millis();
 
-  displayMessage("PLACE FINGER");
-  while (p != FINGERPRINT_OK) p = finger.getImage();
+  displayMessage("PLACE FINGER", ("ID: " + String(id)).c_str());
+  Serial.printf("[ADMIN] Waiting for finger to enroll ID #%d (10s timeout)...\n", id);
+
+  int p = -1;
+  while (p != FINGERPRINT_OK) {
+    if (millis() - startTime > timeoutMs) {
+      Serial.println("[ADMIN] Timeout: No finger placed within 10s. Exiting Admin Mode.");
+      return false;
+    }
+    p = finger.getImage();
+    delay(50);
+  }
 
   if (finger.image2Tz(1) != FINGERPRINT_OK) return false;
 
-  displayMessage("REMOVE");
-  delay(2000);
-  while (finger.getImage() != FINGERPRINT_NOFINGER);
+  displayMessage("REMOVE FINGER", "", 1000);
+  delay(1000);
+  unsigned long removeStartTime = millis();
+  while (finger.getImage() != FINGERPRINT_NOFINGER) {
+    if (millis() - removeStartTime > 5000) break;
+    delay(50);
+  }
 
-  displayMessage("PLACE AGAIN");
-  while (finger.getImage() != FINGERPRINT_OK);
+  displayMessage("PLACE AGAIN", ("ID: " + String(id)).c_str());
+  Serial.println("[ADMIN] Place same finger again...");
+  startTime = millis();
+  p = -1;
+  while (p != FINGERPRINT_OK) {
+    if (millis() - startTime > timeoutMs) {
+      Serial.println("[ADMIN] Timeout: Second scan not detected within 10s. Exiting Admin Mode.");
+      return false;
+    }
+    p = finger.getImage();
+    delay(50);
+  }
 
   if (finger.image2Tz(2) != FINGERPRINT_OK) return false;
   if (finger.createModel() != FINGERPRINT_OK) return false;
   if (finger.storeModel(id) != FINGERPRINT_OK) return false;
 
+  Serial.printf("[ADMIN] Successfully stored Fingerprint ID #%d!\n", id);
   return true;
 }
 
