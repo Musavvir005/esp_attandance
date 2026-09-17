@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { X, Fingerprint, UserCheck } from 'lucide-react';
 
 export default function UserModal({ user, devices = [], onClose, onSave }) {
-  const [fingerprintId, setFingerprintId] = useState(user?.fingerprint_id ?? '');
+  const initialFp = user?.fingerprint_id ?? '';
+  const [fingerprintId, setFingerprintId] = useState(initialFp);
   const [deviceId, setDeviceId] = useState(user?.device_id ?? (devices[0]?.id || ''));
   const [name, setName] = useState(user?.name ?? '');
-  const [role, setRole] = useState(user?.role ?? 'member');
+  const [role, setRole] = useState(user?.role ?? (initialFp ? (initialFp <= 3 ? 'admin' : 'member') : 'member'));
   const [active, setActive] = useState(user?.active ?? true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleFingerprintChange = (val) => {
+    const clean = val.replace(/[^0-9]/g, '');
+    setFingerprintId(clean);
+    const num = parseInt(clean, 10);
+    if (!isNaN(num) && num >= 1) {
+      setRole(num <= 3 ? 'admin' : 'member');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +92,7 @@ export default function UserModal({ user, devices = [], onClose, onSave }) {
                 inputMode="numeric"
                 className="input"
                 value={fingerprintId}
-                onChange={(e) => setFingerprintId(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => handleFingerprintChange(e.target.value)}
                 placeholder="e.g. 17"
                 required
               />

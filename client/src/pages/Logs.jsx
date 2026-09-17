@@ -352,12 +352,10 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                     </td>
 
                     <td>
-                      {log.user_role === 'admin' ? (
+                      {log.user_role === 'admin' || (!log.user_role && log.fingerprint_id <= 3) ? (
                         <span className="badge badge-admin">Administrator</span>
-                      ) : log.user_role === 'member' ? (
-                        <span className="badge badge-member">Member</span>
                       ) : (
-                        <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>Visitor / Unknown</span>
+                        <span className="badge badge-member">Member</span>
                       )}
                     </td>
                   </tr>

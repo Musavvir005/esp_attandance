@@ -166,7 +166,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
                     </td>
 
                     <td>
-                      {user.role === 'admin' ? (
+                      {user.role === 'admin' || user.fingerprint_id <= 3 ? (
                         <span className="badge badge-admin">Administrator</span>
                       ) : (
                         <span className="badge badge-member">Member</span>
