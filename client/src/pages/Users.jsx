@@ -98,20 +98,8 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
             <br />
             <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>
               Click any row to edit that person's name, role or ID. The ESP32 only sends a slot number - you assign the name here.
-            </span>
           </p>
         </div>
-
-        {/* "Add Fingerprint Mapping" = link a new slot number to a person's name */}
-        <button
-          onClick={handleOpenAddModal}
-          className="btn btn-primary"
-          style={{ padding: '10px 18px', flexShrink: 0, marginTop: 4 }}
-          title="Link a fingerprint slot number (1-127 from the sensor) to a person's name and role"
-        >
-          <UserPlus size={16} />
-          <span>Add Fingerprint Mapping</span>
-        </button>
       </div>
 
       {/* Filter and Hardware Summary Bar */}

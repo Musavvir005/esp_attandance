@@ -29,7 +29,6 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [assignModal, setAssignModal] = useState(null); // { log, name, role, saving, error }
 
   // Filters
   const [deviceId, setDeviceId] = useState(selectedRoomId || '');
@@ -82,30 +81,6 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
     fetchLogs();
   };
 
-  // Assign or edit user from logs
-  const handleAssignSave = async () => {
-    if (!assignModal.name.trim()) return;
-    setAssignModal(m => ({ ...m, saving: true, error: '' }));
-    try {
-      if (assignModal.isEdit && assignModal.log.user_id) {
-        await api.updateUser(assignModal.log.user_id, {
-          name: assignModal.name.trim(),
-          role: assignModal.role,
-        });
-      } else {
-        await api.createUser({
-          fingerprint_id: assignModal.log.fingerprint_id,
-          device_id: assignModal.log.device_id,
-          name: assignModal.name.trim(),
-          role: assignModal.role,
-        });
-      }
-      setAssignModal(null);
-      fetchLogs();
-    } catch (err) {
-      setAssignModal(m => ({ ...m, saving: false, error: err.message || 'Failed to save' }));
-    }
-  };
 
   // Auto-refresh timer
   useEffect(() => {
@@ -358,23 +333,14 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
 
                     <td>
                       {isRegistered ? (
-                        <div
-                          style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
-                          onClick={() => setAssignModal({ log, name: log.user_name, role: log.user_role || 'member', saving: false, error: '', isEdit: true })}
-                          title="Click to edit"
-                        >
-                          <span style={{ fontWeight: 600, color: '#fff', textDecoration: 'underline dotted', textUnderlineOffset: 3 }}>{log.user_name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontWeight: 600, color: '#fff' }}>{log.user_name}</span>
                           {!log.user_active && (
                             <span className="badge badge-inactive">SUSPENDED</span>
                           )}
-                          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>✎</span>
                         </div>
                       ) : (
-                        <span
-                          onClick={() => setAssignModal({ log, name: '', role: 'member', saving: false, error: '', isEdit: false })}
-                          style={{ color: 'var(--accent-amber, #f59e0b)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', textDecoration: 'underline dotted' }}
-                          title="Click to assign a name"
-                        >
+                        <span style={{ color: 'var(--accent-amber, #f59e0b)', fontStyle: 'italic' }}>
                           ⚠ Unknown User
                         </span>
                       )}
@@ -451,58 +417,5 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
         </div>
       </div>
     </div>
-
-    {/* Assign Name Modal */}
-    {assignModal && (
-      <div style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 1000,
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }} onClick={() => !assignModal.saving && setAssignModal(null)}>
-        <div onClick={e => e.stopPropagation()} style={{
-          background: 'var(--surface, #1a1f2e)', border: '1px solid var(--border-subtle, #2a3040)',
-          borderRadius: 14, padding: 28, width: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-        }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{assignModal.isEdit ? 'Edit User' : 'Assign Name to Fingerprint'}</h3>
-          <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
-            Room: <strong style={{color:'#fff'}}>{assignModal.log.device_name}</strong> &nbsp;|&nbsp; Slot: <strong style={{color:'var(--accent-cyan)'}}>#{assignModal.log.fingerprint_id}</strong>
-          </p>
-
-          {assignModal.error && (
-            <div style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #ef4444', borderRadius: 8, padding: '8px 12px', marginBottom: 14, fontSize: 13, color: '#ef4444' }}>
-              {assignModal.error}
-            </div>
-          )}
-
-          <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Full Name</label>
-          <input
-            className="input"
-            style={{ width: '100%', marginBottom: 14, fontSize: 13, boxSizing: 'border-box' }}
-            placeholder="e.g. John Doe"
-            value={assignModal.name}
-            autoFocus
-            onChange={e => setAssignModal(m => ({ ...m, name: e.target.value, error: '' }))}
-            onKeyDown={e => e.key === 'Enter' && !assignModal.saving && handleAssignSave()}
-          />
-
-          <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Role</label>
-          <select
-            className="input"
-            style={{ width: '100%', marginBottom: 20, fontSize: 13, boxSizing: 'border-box' }}
-            value={assignModal.role}
-            onChange={e => setAssignModal(m => ({ ...m, role: e.target.value }))}
-          >
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </select>
-
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setAssignModal(null)} disabled={assignModal.saving}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleAssignSave} disabled={assignModal.saving || !assignModal.name.trim()}>
-              {assignModal.saving ? 'Saving...' : 'Save Mapping'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
   );
 }
