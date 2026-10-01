@@ -339,8 +339,8 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                           )}
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>
-                          Unregistered Fingerprint
+                        <span style={{ color: 'var(--accent-amber, #f59e0b)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          ⚠ Unknown User
                         </span>
                       )}
                     </td>
