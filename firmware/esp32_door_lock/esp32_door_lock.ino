@@ -15,11 +15,11 @@ const char* ssid = "srmap-iotlab";
 const char* password = "I0T#2o24L@b";
 
 // ================= BACKEND =================
-const char* server_url  = "https://esp-attandance.onrender.com/log";
-const char* unlock_url  = "https://esp-attandance.onrender.com/check-unlock";
+const char* server_url  = "https://esp-attandance.vercel.app/log";
+const char* unlock_url  = "https://esp-attandance.vercel.app/check-unlock";
 
 // ================= ROOM =================
-const char* DIR_NAME = "G C M S";
+const char* DIR_NAME = "G_C_M_S";
 
 // ================= TIMING =================
 unsigned long lastUnlockCheck = 0;

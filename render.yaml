@@ -13,9 +13,9 @@ services:
           name: esp32-lock-db
           property: connectionString
       - key: ADMIN_USERNAME
-        sync: false
+        value: SRM_srm
       - key: ADMIN_PASSWORD
-        sync: false
+        value: srm@bio
       - key: JWT_SECRET
         generateValue: true
       - key: RATE_LIMIT_CHECK_PER_MINUTE
