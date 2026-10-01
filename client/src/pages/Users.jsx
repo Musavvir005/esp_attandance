@@ -17,6 +17,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [autoDetected, setAutoDetected] = useState(null); // { fingerprint_id, device_id, device_name }
 
   useEffect(() => {
     setSelectedDevice(selectedRoomId || '');
@@ -50,6 +51,30 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
     loadData();
   };
 
+  const handleOpenAddModal = async () => {
+    setEditingUser(null);
+    setAutoDetected(null);
+    try {
+      // Fetch latest unassigned scan
+      const res = await api.getLogs({
+        limit: 50,
+        device_id: selectedDevice || undefined,
+      });
+      const logs = res.logs || [];
+      const unknown = logs.find(l => !l.user_name);
+      if (unknown) {
+        setAutoDetected({
+          fingerprint_id: unknown.fingerprint_id,
+          device_id: unknown.device_id,
+          device_name: unknown.device_name,
+        });
+      }
+    } catch (err) {
+      // ignore, fall back to manual
+    }
+    setModalOpen(true);
+  };
+
   // Format enrolled date + time with seconds
   const formatEnrolled = (dateStr) => {
     const d = new Date(dateStr);
@@ -79,7 +104,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
 
         {/* "Add Fingerprint Mapping" = link a new slot number to a person's name */}
         <button
-          onClick={() => { setEditingUser(null); setModalOpen(true); }}
+          onClick={handleOpenAddModal}
           className="btn btn-primary"
           style={{ padding: '10px 18px', flexShrink: 0, marginTop: 4 }}
           title="Link a fingerprint slot number (1-127 from the sensor) to a person's name and role"
@@ -203,7 +228,8 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
         <UserModal
           user={editingUser}
           devices={devices}
-          onClose={() => { setModalOpen(false); setEditingUser(null); }}
+          autoDetected={!editingUser ? autoDetected : null}
+          onClose={() => { setModalOpen(false); setEditingUser(null); setAutoDetected(null); }}
           onSave={handleSaveUser}
         />
       )}
