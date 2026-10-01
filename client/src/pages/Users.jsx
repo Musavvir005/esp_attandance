@@ -151,7 +151,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
                     key={user.id}
                     onClick={() => { setEditingUser(user); setModalOpen(true); }}
                     title="Click to edit name, role or fingerprint ID"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', userSelect: 'none' }}
                   >
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
