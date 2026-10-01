@@ -19,8 +19,7 @@ const char* server_url  = "https://esp-attandance.onrender.com/log";
 const char* unlock_url  = "https://esp-attandance.onrender.com/check-unlock";
 
 // ================= ROOM =================
-// ⚠️  Room identifier (e.g. CRF_LAB_1, ROOM_1, etc.)
-const char* DIR_NAME = "CRF_LAB_1";
+const char* DIR_NAME = "G C M S";
 
 // ================= TIMING =================
 unsigned long lastUnlockCheck = 0;
@@ -333,9 +332,9 @@ void lockDoor() {
 }
 
 void unlockDoor(uint32_t ms) {
-  digitalWrite(RELAY_PIN, HIGH);
-  delay(ms);
   digitalWrite(RELAY_PIN, LOW);
+  delay(ms);
+  digitalWrite(RELAY_PIN, HIGH);
 }
 
 // void beepOnce() {
@@ -447,7 +446,7 @@ void checkUnlock() {
     body.trim();
     if (body == "true") {
       // Remote unlock requested from admin dashboard
-      Serial.println("[REMOTE] Unlock signal received from website!");
+      Serial.println("[REMOTE] Unlock signal received!");
       beepThrice(100, 100, 100);
       displayMessage("REMOTE", "UNLOCK", 500);
       unlockDoor(5000);

@@ -69,4 +69,6 @@ export const api = {
     const qs = searchParams.toString();
     return request(`/logs${qs ? `?${qs}` : ''}`);
   },
+  clearLogs: () => request('/logs', { method: 'DELETE' }),
 };
+

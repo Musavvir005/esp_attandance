@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { X, Fingerprint, UserCheck } from 'lucide-react';
+import { X, Fingerprint } from 'lucide-react';
 
 export default function UserModal({ user, devices = [], onClose, onSave }) {
   const initialFp = user?.fingerprint_id ?? '';
   const [fingerprintId, setFingerprintId] = useState(initialFp);
   const [deviceId, setDeviceId] = useState(user?.device_id ?? (devices[0]?.id || ''));
   const [name, setName] = useState(user?.name ?? '');
-  const [role, setRole] = useState(user?.role ?? (initialFp ? (initialFp <= 3 ? 'admin' : 'member') : 'member'));
+  // Role is ALWAYS derived from slot number — never from DB value
+  const computeRole = (fp) => (parseInt(fp, 10) <= 3 ? 'admin' : 'member');
+  const [role, setRole] = useState(initialFp !== '' ? computeRole(initialFp) : 'member');
   const [active, setActive] = useState(user?.active ?? true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -136,14 +138,32 @@ export default function UserModal({ user, devices = [], onClose, onSave }) {
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
                 Access Role
               </label>
-              <select
-                className="input"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="member">Member</option>
-                <option value="admin">Administrator</option>
-              </select>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                height: 40,
+                padding: '0 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.04)',
+                fontSize: 14,
+                color: role === 'admin' ? '#a78bfa' : 'var(--accent-cyan)',
+                fontWeight: 600,
+              }}>
+                <span style={{
+                  display: 'inline-block',
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: role === 'admin' ? '#a78bfa' : 'var(--accent-cyan)',
+                  flexShrink: 0,
+                }} />
+                {role === 'admin' ? 'Administrator' : 'Member'}
+                <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)', fontWeight: 400 }}>
+                  auto
+                </span>
+              </div>
             </div>
 
             <div>

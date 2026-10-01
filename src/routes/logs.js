@@ -157,4 +157,22 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/logs
+ * Clears ALL access logs from the database (admin only)
+ */
+router.delete('/', async (req, res) => {
+  try {
+    const result = await db.query('DELETE FROM access_logs RETURNING id');
+    return res.json({
+      message: `Cleared ${result.rowCount} access log records.`,
+      deleted: result.rowCount,
+    });
+  } catch (err) {
+    console.error('Error clearing logs:', err);
+    return res.status(500).json({ error: 'Failed to clear access logs' });
+  }
+});
+
 module.exports = router;
+
