@@ -56,13 +56,14 @@ router.post('/', async (req, res) => {
   }
 
   const cleanName = name.trim().toUpperCase().replace(/\s+/g, '_');
+  const secretKey = crypto.randomBytes(32).toString('hex');
 
   try {
     const result = await db.query(
-      `INSERT INTO devices (name, location)
-       VALUES ($1, $2)
+      `INSERT INTO devices (name, secret_key, location)
+       VALUES ($1, $2, $3)
        RETURNING *`,
-      [cleanName, location ? location.trim() : null]
+      [cleanName, secretKey, location ? location.trim() : null]
     );
 
     return res.status(201).json({
