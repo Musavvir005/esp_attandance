@@ -82,17 +82,24 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
     fetchLogs();
   };
 
-  // Assign name to unknown fingerprint
+  // Assign or edit user from logs
   const handleAssignSave = async () => {
     if (!assignModal.name.trim()) return;
     setAssignModal(m => ({ ...m, saving: true, error: '' }));
     try {
-      await api.createUser({
-        fingerprint_id: assignModal.log.fingerprint_id,
-        device_id: assignModal.log.device_id,
-        name: assignModal.name.trim(),
-        role: assignModal.role,
-      });
+      if (assignModal.isEdit && assignModal.log.user_id) {
+        await api.updateUser(assignModal.log.user_id, {
+          name: assignModal.name.trim(),
+          role: assignModal.role,
+        });
+      } else {
+        await api.createUser({
+          fingerprint_id: assignModal.log.fingerprint_id,
+          device_id: assignModal.log.device_id,
+          name: assignModal.name.trim(),
+          role: assignModal.role,
+        });
+      }
       setAssignModal(null);
       fetchLogs();
     } catch (err) {
@@ -351,15 +358,20 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
 
                     <td>
                       {isRegistered ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontWeight: 600, color: '#fff' }}>{log.user_name}</span>
+                        <div
+                          style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                          onClick={() => setAssignModal({ log, name: log.user_name, role: log.user_role || 'member', saving: false, error: '', isEdit: true })}
+                          title="Click to edit"
+                        >
+                          <span style={{ fontWeight: 600, color: '#fff', textDecoration: 'underline dotted', textUnderlineOffset: 3 }}>{log.user_name}</span>
                           {!log.user_active && (
                             <span className="badge badge-inactive">SUSPENDED</span>
                           )}
+                          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>✎</span>
                         </div>
                       ) : (
                         <span
-                          onClick={() => setAssignModal({ log, name: '', role: 'member', saving: false, error: '' })}
+                          onClick={() => setAssignModal({ log, name: '', role: 'member', saving: false, error: '', isEdit: false })}
                           style={{ color: 'var(--accent-amber, #f59e0b)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', textDecoration: 'underline dotted' }}
                           title="Click to assign a name"
                         >
@@ -450,7 +462,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
           background: 'var(--surface, #1a1f2e)', border: '1px solid var(--border-subtle, #2a3040)',
           borderRadius: 14, padding: 28, width: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
         }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Assign Name to Fingerprint</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{assignModal.isEdit ? 'Edit User' : 'Assign Name to Fingerprint'}</h3>
           <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
             Room: <strong style={{color:'#fff'}}>{assignModal.log.device_name}</strong> &nbsp;|&nbsp; Slot: <strong style={{color:'var(--accent-cyan)'}}>#{assignModal.log.fingerprint_id}</strong>
           </p>
