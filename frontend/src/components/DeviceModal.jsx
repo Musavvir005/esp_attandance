@@ -69,7 +69,7 @@ export default function DeviceModal({ device, onClose, onSave }) {
               className="input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. CRF_LAB_1, ROOM_1, LAB_202"
+              placeholder="e.g. FUN_LAB, LAB_202"
               required
             />
             <span style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4, display: 'block' }}>

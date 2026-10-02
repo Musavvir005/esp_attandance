@@ -187,7 +187,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 type="text"
                 className="input"
                 style={{ paddingLeft: 34, fontSize: 13 }}
-                placeholder="e.g.Doremon , FUN_LAB"
+                placeholder="e.g. Doremon, FUN_LAB"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

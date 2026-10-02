@@ -104,7 +104,7 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
           {/* Name — always */}
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Full Name</label>
-            <input type="text" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. John Doe, Sarah Connor" autoFocus required />
+            <input type="text" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Doremon, Nobita" autoFocus required />
           </div>
 
           {/* Role + Status */}
