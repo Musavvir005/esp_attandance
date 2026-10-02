@@ -1,8 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const request = require('supertest');
-const { app } = require('../src/server');
-const db = require('../src/config/db');
+const { app } = require('../backend/server');
+const db = require('../backend/config/db');
 
 // Multi-device test fixture
 const mockDevices = [

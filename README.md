@@ -8,7 +8,7 @@ High-performance Node.js/Express and PostgreSQL backend with a modern, responsiv
 
 - **Backend**: Express + Node.js (with built-in rate-limiting, secure HTTP-only session JWT cookies, PostgreSQL connection pool).
 - **Database**: PostgreSQL (Render Postgres, Neon, or Supabase). Automatically executes schema migrations and seeds default room `FUN_LAB`.
-- **Frontend**: React + Vite single-page dashboard built into `client/dist` and served statically by Express under a single deployable Render Web Service.
+- **Frontend**: React + Vite single-page dashboard built into `frontend/dist` and served statically by Express under a single deployable Render Web Service.
 
 ---
 

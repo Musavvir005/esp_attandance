@@ -51,16 +51,16 @@ app.use('/api/users', usersRoutes);
 app.use('/api/unlock', unlockRoutes);
 app.use('/api/logs', logsRoutes);
 
-// Serve client frontend in production if built
-const clientDistPath = path.join(__dirname, '../client/dist');
-if (fs.existsSync(clientDistPath)) {
-  app.use(express.static(clientDistPath));
+// Serve frontend in production if built
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
   app.get('*', (req, res, next) => {
     // Skip API routes
     if (req.path.startsWith('/api') || req.path === '/log' || req.path === '/check-unlock' || req.path === '/health') {
       return next();
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
 } else {
   // Helpful fallback during development before frontend is built
@@ -90,7 +90,7 @@ if (fs.existsSync(clientDistPath)) {
               <li><code>POST /api/auth/login</code> - Admin authentication</li>
               <li><code>/api/devices</code>, <code>/api/users</code>, <code>/api/unlock</code>, <code>/api/logs</code></li>
             </ul>
-            <p style="color: #94a3b8; font-size: 13px;">Frontend dashboard is compiling in <code>client/</code>...</p>
+            <p style="color: #94a3b8; font-size: 13px;">Frontend dashboard is compiling in <code>frontend/</code>...</p>
           </div>
         </body>
       </html>
