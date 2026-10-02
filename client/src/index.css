@@ -221,6 +221,50 @@ body {
   color: #0f172a;
 }
 
+/* Inverted Theme Toggle Button: Light in Dark Mode, Dark in Light Mode */
+.btn-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+/* In Dark mode -> Button is LIGHT (stands out against dark background) */
+[data-theme="dark"] .btn-theme-toggle,
+:root .btn-theme-toggle {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .btn-theme-toggle:hover,
+:root .btn-theme-toggle:hover {
+  background: #f8fafc !important;
+  color: #0284c7 !important;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+/* In Light mode -> Button is DARK (stands out against light background) */
+[data-theme="light"] .btn-theme-toggle {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35), 0 0 12px rgba(99, 102, 241, 0.25);
+}
+[data-theme="light"] .btn-theme-toggle:hover {
+  background: #1e293b !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.5);
+  transform: translateY(-1px);
+}
+
 .btn-danger {
   background: rgba(244, 63, 94, 0.12);
   border-color: rgba(244, 63, 94, 0.3);

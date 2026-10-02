@@ -111,25 +111,17 @@ export default function Navbar({
           {/* Day / Night Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className="btn btn-secondary btn-sm"
-            style={{
-              padding: '6px 12px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-              fontSize: 12,
-              fontWeight: 700,
-            }}
+            className="btn-theme-toggle"
             title={`Switch to ${theme === 'dark' ? 'Day (Light)' : 'Night (Dark)'} Theme`}
           >
             {theme === 'dark' ? (
               <>
-                <Sun size={15} color="var(--accent-amber)" />
+                <Sun size={15} color="#d97706" />
                 <span>Day</span>
               </>
             ) : (
               <>
-                <Moon size={15} color="var(--accent-indigo)" />
+                <Moon size={15} color="#818cf8" />
                 <span>Night</span>
               </>
             )}

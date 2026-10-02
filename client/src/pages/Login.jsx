@@ -36,26 +36,22 @@ export default function Login({ onLoginSuccess, theme = 'dark', onToggleTheme })
       {onToggleTheme && (
         <button
           onClick={onToggleTheme}
-          className="btn btn-secondary btn-sm"
+          className="btn-theme-toggle"
           style={{
             position: 'absolute',
             top: 24,
             right: 24,
-            padding: '7px 13px',
-            gap: 7,
-            fontSize: 12,
-            fontWeight: 700,
           }}
           title={`Switch to ${theme === 'dark' ? 'Day (Light)' : 'Night (Dark)'} Theme`}
         >
           {theme === 'dark' ? (
             <>
-              <Sun size={15} color="var(--accent-amber)" />
+              <Sun size={15} color="#d97706" />
               <span>Day Theme</span>
             </>
           ) : (
             <>
-              <Moon size={15} color="var(--accent-indigo)" />
+              <Moon size={15} color="#818cf8" />
               <span>Night Theme</span>
             </>
           )}
