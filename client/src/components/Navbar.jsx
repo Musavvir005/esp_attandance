@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Key, Users, History, Cpu, LogOut, ChevronDown, Layers } from 'lucide-react';
+import { Shield, Key, Users, History, Cpu, LogOut, ChevronDown, Layers, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ 
   activeTab, 
@@ -8,17 +8,20 @@ export default function Navbar({
   stats, 
   devices = [], 
   selectedRoomId, 
-  onSelectRoom 
+  onSelectRoom,
+  theme = 'dark',
+  onToggleTheme
 }) {
   return (
     <header style={{
       borderBottom: '1px solid var(--border-subtle)',
-      background: 'rgba(10, 14, 26, 0.85)',
+      background: 'var(--bg-navbar)',
       backdropFilter: 'blur(12px)',
       position: 'sticky',
       top: 0,
       zIndex: 100,
       padding: '0 24px',
+      transition: 'background-color 0.25s ease',
     }}>
       <div style={{
         maxWidth: 1300,
@@ -44,7 +47,7 @@ export default function Navbar({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em', color: '#fff' }}>
+              <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
                 GATEKEEPER
               </span>
               <span className="mono-tag" style={{ fontSize: 10, padding: '1px 6px' }}>MULTI-ROOM BIO-LOCK</span>
@@ -86,7 +89,7 @@ export default function Navbar({
           >
             <Layers size={16} />
             <span>Room Workspaces</span>
-            <span className="mono-tag" style={{ fontSize: 10, padding: '1px 6px' }}>{devices.length}</span>
+            <span className="room-user-count-badge">{devices.length}</span>
           </button>
 
           <button
@@ -103,8 +106,35 @@ export default function Navbar({
           </button>
         </nav>
 
-        {/* Logout */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Actions: Theme Toggle + Logout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Day / Night Theme Toggle */}
+          <button
+            onClick={onToggleTheme}
+            className="btn btn-secondary btn-sm"
+            style={{
+              padding: '6px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+            title={`Switch to ${theme === 'dark' ? 'Day (Light)' : 'Night (Dark)'} Theme`}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun size={15} color="var(--accent-amber)" />
+                <span>Day</span>
+              </>
+            ) : (
+              <>
+                <Moon size={15} color="var(--accent-indigo)" />
+                <span>Night</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={onLogout}
             className="btn btn-secondary btn-sm"

@@ -185,7 +185,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
             </span>
             <Activity size={18} color="var(--accent-cyan)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: '#fff' }}>
+          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
             {stats?.today_scans || 0}
           </div>
           <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Multi-room biometric events</span>
@@ -198,7 +198,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
             </span>
             <Cpu size={18} color="var(--accent-emerald)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: '#fff' }}>
+          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
             {stats?.online_devices || 0}
             <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dim)', marginLeft: 6 }}>
               / {stats?.total_devices || 0} online
@@ -214,7 +214,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
             </span>
             <Users size={18} color="var(--accent-indigo)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: '#fff' }}>
+          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
             {stats?.active_users || 0}
           </div>
           <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Mapped across all doors</span>
@@ -227,7 +227,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
             </span>
             <Lock size={18} color="var(--accent-amber)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: '#fff' }}>
+          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
             {stats?.pending_unlocks || 0}
           </div>
           <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Queued in-flight commands</span>
@@ -280,7 +280,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} />
-                        <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
+                        <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                           {device.name}
                         </h3>
                         <span className="mono-tag" style={{ fontSize: 11 }}>
@@ -454,7 +454,7 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>
                         {log.user_name || `Unknown ID #${log.fingerprint_id}`}
                       </span>
                       <span className="mono-tag" style={{ fontSize: 10 }}>

@@ -123,7 +123,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <History size={24} color="var(--accent-cyan)" />
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
               {currentRoom ? `${currentRoom.name} — Access Logs` : 'Audit & Access History'}
             </h1>
             {currentRoom && (
@@ -200,7 +200,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
             </label>
             {currentRoom ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 42 }}>
-                <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: '#fff', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
                   {currentRoom.name}
                 </span>
                 <button 
@@ -348,7 +348,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 return (
                   <tr key={log.id}>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#fff' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
                         {logDate}
                       </div>
                     </td>
@@ -360,7 +360,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                     </td>
 
                     <td>
-                      <div style={{ fontWeight: 700, color: '#fff' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>
                         {log.device_name || `Device #${log.device_id}`}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>
@@ -371,7 +371,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                     <td>
                       {isRegistered ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontWeight: 600, color: '#fff' }}>{log.user_name}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{log.user_name}</span>
                           {!log.user_active && (
                             <span className="badge badge-inactive">SUSPENDED</span>
                           )}
@@ -422,8 +422,8 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
           color: 'var(--text-muted)',
         }}>
           <div>
-            Showing <strong style={{ color: '#fff' }}>{logs.length}</strong> of{' '}
-            <strong style={{ color: '#fff' }}>{pagination.total}</strong> records
+            Showing <strong style={{ color: 'var(--text-main)' }}>{logs.length}</strong> of{' '}
+            <strong style={{ color: 'var(--text-main)' }}>{pagination.total}</strong> records
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -438,7 +438,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
             </button>
 
             <span>
-              Page <strong style={{ color: '#fff' }}>{page}</strong> of {pagination.totalPages || 1}
+              Page <strong style={{ color: 'var(--text-main)' }}>{page}</strong> of {pagination.totalPages || 1}
             </span>
 
             <button

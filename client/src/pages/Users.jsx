@@ -93,7 +93,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <UsersIcon size={24} color="var(--accent-indigo)" />
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
               {currentRoom ? `${currentRoom.name} — User Directory` : 'Biometric User Directory'}
             </h1>
             {currentRoom && (
@@ -138,7 +138,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Room:</span>
           {currentRoom ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: '#fff', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+              <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
                 {currentRoom.name} {currentRoom.location ? `(${currentRoom.location})` : ''}
               </span>
               <button 
@@ -166,7 +166,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: 'var(--text-dim)' }}>
           <div>
-            Assigned in {currentRoom ? currentRoom.name : 'System'}: <strong style={{ color: '#fff' }}>{users.length}</strong>
+            Assigned in {currentRoom ? currentRoom.name : 'System'}: <strong style={{ color: 'var(--text-main)' }}>{users.length}</strong>
           </div>
           <div>
             Slot Capacity: <strong style={{ color: 'var(--accent-cyan)' }}>127 Slots/Unit</strong>
@@ -208,7 +208,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
 
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>
+                        <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>
                           {user.name}
                         </span>
                         <Pencil size={12} color="var(--text-dim)" style={{ opacity: 0.45, flexShrink: 0 }} />

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Shield, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { Shield, Lock, User, AlertCircle, ArrowRight, Sun, Moon } from 'lucide-react';
 import { api } from '../api';
 
-export default function Login({ onLoginSuccess }) {
-  const [username, setUsername] = useState('admin');
+export default function Login({ onLoginSuccess, theme = 'dark', onToggleTheme }) {
+  const [username, setUsername] = useState('SRM_srm');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,6 +32,36 @@ export default function Login({ onLoginSuccess }) {
       padding: '20px',
       position: 'relative',
     }}>
+      {/* Theme Toggle Button top-right */}
+      {onToggleTheme && (
+        <button
+          onClick={onToggleTheme}
+          className="btn btn-secondary btn-sm"
+          style={{
+            position: 'absolute',
+            top: 24,
+            right: 24,
+            padding: '7px 13px',
+            gap: 7,
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+          title={`Switch to ${theme === 'dark' ? 'Day (Light)' : 'Night (Dark)'} Theme`}
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun size={15} color="var(--accent-amber)" />
+              <span>Day Theme</span>
+            </>
+          ) : (
+            <>
+              <Moon size={15} color="var(--accent-indigo)" />
+              <span>Night Theme</span>
+            </>
+          )}
+        </button>
+      )}
+
       <div className="glass-panel" style={{
         width: '100%',
         maxWidth: 420,
@@ -67,7 +97,7 @@ export default function Login({ onLoginSuccess }) {
           }}>
             <Shield size={30} color="#fff" />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
             Biometric Gatekeeper
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 6 }}>

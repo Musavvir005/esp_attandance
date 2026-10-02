@@ -143,7 +143,7 @@ export default function RoomBar({
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className={`status-dot ${currentDevice.is_online ? 'online' : 'offline'}`} />
-              <span style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
                 {currentDevice.name}
               </span>
               <span className={`badge ${currentDevice.is_online ? 'badge-active' : 'badge-inactive'}`} style={{ fontSize: 10, padding: '1px 7px' }}>

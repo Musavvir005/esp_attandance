@@ -18,6 +18,20 @@ export default function App() {
   const [selectedRoomId, setSelectedRoomId] = useState('');
   const [addRoomModalOpen, setAddRoomModalOpen] = useState(false);
 
+  // Theme state: Day (light) and Night (dark)
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('gatekeeper_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('gatekeeper_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Check login session on mount
   useEffect(() => {
     checkAuth();
@@ -95,7 +109,13 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login onLoginSuccess={(u) => { setUser(u); loadDashboardData(); }} />;
+    return (
+      <Login 
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLoginSuccess={(u) => { setUser(u); loadDashboardData(); }} 
+      />
+    );
   }
 
   return (
@@ -108,6 +128,8 @@ export default function App() {
         devices={devices}
         selectedRoomId={selectedRoomId}
         onSelectRoom={setSelectedRoomId}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Dynamic Room Bar & Subnav */}

@@ -67,7 +67,7 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Cpu size={24} color="var(--accent-cyan)" />
             Door Units &amp; Rooms
           </h1>
@@ -98,7 +98,7 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} />
-                  <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                     {device.name}
                   </h3>
                   <span className={`badge ${device.is_online ? 'badge-active' : 'badge-inactive'}`}>
