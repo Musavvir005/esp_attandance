@@ -56,45 +56,8 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Global Room Switcher */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          background: 'rgba(15, 23, 42, 0.9)',
-          padding: '4px 10px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-subtle)',
-        }}>
-          <Layers size={15} color="var(--accent-cyan)" />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-            Room:
-          </span>
-          <select
-            value={selectedRoomId || ''}
-            onChange={(e) => onSelectRoom(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: 'pointer',
-              outline: 'none',
-              fontFamily: 'var(--font-sans)',
-            }}
-          >
-            <option value="" style={{ background: '#0f172a', color: '#fff' }}>All Rooms (Overview)</option>
-            {devices.map((d) => (
-              <option key={d.id} value={d.id} style={{ background: '#0f172a', color: '#fff' }}>
-                {d.name} {d.location ? `(${d.location})` : ''}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', gap: 6 }}>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => setActiveTab('controls')}
             className="btn"
@@ -109,29 +72,21 @@ export default function Navbar({
           </button>
 
           <button
-            onClick={() => setActiveTab('logs')}
+            onClick={() => {
+              if (activeTab !== 'logs' && activeTab !== 'users') {
+                setActiveTab('logs');
+              }
+            }}
             className="btn"
             style={{
-              background: activeTab === 'logs' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-              color: activeTab === 'logs' ? 'var(--accent-cyan)' : 'var(--text-muted)',
-              borderColor: activeTab === 'logs' ? 'var(--border-glow)' : 'transparent',
+              background: (activeTab === 'logs' || activeTab === 'users') ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+              color: (activeTab === 'logs' || activeTab === 'users') ? 'var(--accent-indigo)' : 'var(--text-muted)',
+              borderColor: (activeTab === 'logs' || activeTab === 'users') ? 'rgba(99, 102, 241, 0.4)' : 'transparent',
             }}
           >
-            <History size={16} />
-            <span>Access Logs</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('users')}
-            className="btn"
-            style={{
-              background: activeTab === 'users' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-              color: activeTab === 'users' ? 'var(--accent-cyan)' : 'var(--text-muted)',
-              borderColor: activeTab === 'users' ? 'var(--border-glow)' : 'transparent',
-            }}
-          >
-            <Users size={16} />
-            <span>User Directory</span>
+            <Layers size={16} />
+            <span>Room Workspaces</span>
+            <span className="mono-tag" style={{ fontSize: 10, padding: '1px 6px' }}>{devices.length}</span>
           </button>
 
           <button
@@ -143,7 +98,7 @@ export default function Navbar({
               borderColor: activeTab === 'devices' ? 'var(--border-glow)' : 'transparent',
             }}
           >
-            <Cpu size={16} />
+            <Shield size={16} />
             <span>Door Units</span>
           </button>
         </nav>

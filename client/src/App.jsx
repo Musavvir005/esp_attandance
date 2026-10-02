@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import RoomBar from './components/RoomBar';
+import DeviceModal from './components/DeviceModal';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Logs from './pages/Logs';
@@ -14,6 +16,7 @@ export default function App() {
   const [stats, setStats] = useState(null);
   const [devices, setDevices] = useState([]);
   const [selectedRoomId, setSelectedRoomId] = useState('');
+  const [addRoomModalOpen, setAddRoomModalOpen] = useState(false);
 
   // Check login session on mount
   useEffect(() => {
@@ -39,16 +42,25 @@ export default function App() {
         api.getDevices(),
       ]);
       setStats(statsData);
-      setDevices(devicesData.devices || []);
+      const list = devicesData.devices || [];
+      setDevices(list);
+
+      // Keep selectedRoomId valid: if empty or deleted, pick first available room
+      setSelectedRoomId((prev) => {
+        if (list.length === 0) return '';
+        const exists = list.some(d => String(d.id) === String(prev));
+        if (exists) return prev;
+        return list[0].id;
+      });
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     }
   };
 
-  // Poll stats every 8 seconds if logged in
+  // Poll stats every 6 seconds if logged in
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(loadDashboardData, 8000);
+    const interval = setInterval(loadDashboardData, 6000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -59,6 +71,11 @@ export default function App() {
       console.error('Logout error:', err);
     }
     setUser(null);
+  };
+
+  const handleNavigateToRoom = (roomId, tab = 'logs') => {
+    setSelectedRoomId(roomId);
+    setActiveTab(tab);
   };
 
   if (loading) {
@@ -93,6 +110,17 @@ export default function App() {
         onSelectRoom={setSelectedRoomId}
       />
 
+      {/* Dynamic Room Bar & Subnav */}
+      <RoomBar
+        devices={devices}
+        selectedRoomId={selectedRoomId}
+        onSelectRoom={(id) => setSelectedRoomId(id)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenAddRoom={() => setAddRoomModalOpen(true)}
+        onRefreshStats={loadDashboardData}
+      />
+
       <main style={{ flex: 1 }}>
         {activeTab === 'controls' && (
           <Dashboard
@@ -101,26 +129,45 @@ export default function App() {
             selectedRoomId={selectedRoomId}
             onSelectRoom={setSelectedRoomId}
             onRefreshStats={loadDashboardData}
+            onNavigateToRoom={handleNavigateToRoom}
           />
         )}
         {activeTab === 'logs' && (
           <Logs
             selectedRoomId={selectedRoomId}
             onSelectRoom={setSelectedRoomId}
+            onSwitchToUsers={() => setActiveTab('users')}
           />
         )}
         {activeTab === 'users' && (
           <Users
             selectedRoomId={selectedRoomId}
             onSelectRoom={setSelectedRoomId}
+            onSwitchToLogs={() => setActiveTab('logs')}
           />
         )}
         {activeTab === 'devices' && (
           <Devices
             onDevicesUpdated={loadDashboardData}
+            onNavigateToRoom={handleNavigateToRoom}
           />
         )}
       </main>
+
+      {/* Global Quick Add Room Modal */}
+      {addRoomModalOpen && (
+        <DeviceModal
+          onClose={() => setAddRoomModalOpen(false)}
+          onSave={async (data) => {
+            const res = await api.createDevice(data);
+            await loadDashboardData();
+            if (res?.device?.id) {
+              setSelectedRoomId(res.device.id);
+              setActiveTab('logs');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

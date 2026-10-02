@@ -10,7 +10,7 @@ import {
 import { api } from '../api';
 import UserModal from '../components/UserModal';
 
-export default function Users({ selectedRoomId = '', onSelectRoom }) {
+export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLogs }) {
   const [users, setUsers] = useState([]);
   const [devices, setDevices] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(selectedRoomId || '');
@@ -55,7 +55,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
     setEditingUser(null);
     setAutoDetected(null);
     try {
-      // Fetch latest unassigned scan
+      // Fetch latest unassigned scan for this specific room
       const res = await api.getLogs({
         limit: 50,
         device_id: selectedDevice || undefined,
@@ -84,21 +84,50 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
     return { date, time };
   };
 
+  const currentRoom = devices.find(d => String(d.id) === String(selectedDevice));
+
   return (
     <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <UsersIcon size={24} color="var(--accent-indigo)" />
-            Biometric User Directory
-          </h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>
+              {currentRoom ? `${currentRoom.name} — User Directory` : 'Biometric User Directory'}
+            </h1>
+            {currentRoom && (
+              <span className={`badge ${currentRoom.is_online ? 'badge-active' : 'badge-inactive'}`}>
+                {currentRoom.is_online ? 'ONLINE' : 'OFFLINE'}
+              </span>
+            )}
+          </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            Map sensor hardware fingerprint IDs (1-127) to human identities and permissions.
-            <br />
-            <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>
-              Click any row to edit that person's name, role or ID. The ESP32 only sends a slot number - you assign the name here.
+            {currentRoom 
+              ? `Manage fingerprint slots (1-127) and authorized identities for ${currentRoom.name} (${currentRoom.location || 'Location unassigned'}).`
+              : 'Map sensor hardware fingerprint IDs (1-127) to human identities and permissions across all units.'}
           </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {currentRoom && onSwitchToLogs && (
+            <button
+              onClick={onSwitchToLogs}
+              className="btn btn-secondary btn-sm"
+              title={`View access history for ${currentRoom.name}`}
+            >
+              <span>{currentRoom.name} Access Logs</span>
+            </button>
+          )}
+
+          <button
+            onClick={handleOpenAddModal}
+            className="btn btn-primary btn-sm"
+            style={{ padding: '8px 16px' }}
+          >
+            <UserPlus size={15} />
+            <span>{currentRoom ? `Enroll User (${currentRoom.name})` : 'Enroll Identity'}</span>
+          </button>
         </div>
       </div>
 
@@ -106,26 +135,41 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
       <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Filter size={16} color="var(--text-dim)" />
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Room Filter:</span>
-          <select
-            className="input"
-            style={{ width: 220, fontSize: 13 }}
-            value={selectedDevice}
-            onChange={(e) => setSelectedDevice(e.target.value)}
-          >
-            <option value="">All Rooms / Door Units</option>
-            {devices.map((d) => (
-              <option key={d.id} value={d.id}>{d.name} {d.location ? `(${d.location})` : ''}</option>
-            ))}
-          </select>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Room:</span>
+          {currentRoom ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: '#fff', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                {currentRoom.name} {currentRoom.location ? `(${currentRoom.location})` : ''}
+              </span>
+              <button 
+                onClick={() => setSelectedDevice('')}
+                className="btn btn-secondary btn-sm"
+                style={{ fontSize: 11, padding: '3px 8px' }}
+              >
+                View All Rooms
+              </button>
+            </div>
+          ) : (
+            <select
+              className="input"
+              style={{ width: 220, fontSize: 13 }}
+              value={selectedDevice}
+              onChange={(e) => setSelectedDevice(e.target.value)}
+            >
+              <option value="">All Rooms / Door Units</option>
+              {devices.map((d) => (
+                <option key={d.id} value={d.id}>{d.name} {d.location ? `(${d.location})` : ''}</option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: 'var(--text-dim)' }}>
           <div>
-            Total Assigned: <strong style={{ color: '#fff' }}>{users.length}</strong>
+            Assigned in {currentRoom ? currentRoom.name : 'System'}: <strong style={{ color: '#fff' }}>{users.length}</strong>
           </div>
           <div>
-            R307/AS608 Capacity: <strong style={{ color: 'var(--accent-cyan)' }}>127 Slots/Unit</strong>
+            Slot Capacity: <strong style={{ color: 'var(--accent-cyan)' }}>127 Slots/Unit</strong>
           </div>
         </div>
       </div>
@@ -216,6 +260,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom }) {
         <UserModal
           user={editingUser}
           devices={devices}
+          defaultDeviceId={selectedDevice}
           autoDetected={!editingUser ? autoDetected : null}
           onClose={() => { setModalOpen(false); setEditingUser(null); setAutoDetected(null); }}
           onSave={handleSaveUser}

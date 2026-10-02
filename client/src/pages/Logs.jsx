@@ -23,7 +23,7 @@ const getTodayDateString = () => {
   return `${year}-${month}-${day}`;
 };
 
-export default function Logs({ selectedRoomId = '', onSelectRoom }) {
+export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUsers }) {
   const dateInputRef = useRef(null);
   const [logs, setLogs] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -81,7 +81,6 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
     fetchLogs();
   };
 
-
   // Auto-refresh timer
   useEffect(() => {
     if (!autoRefresh) return;
@@ -90,6 +89,8 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
     }, 3000);
     return () => clearInterval(timer);
   }, [autoRefresh, page, deviceId, fingerprintId, selectedDate, search]);
+
+  const currentRoom = devices.find(d => String(d.id) === String(deviceId));
 
   const exportCSV = () => {
     if (logs.length === 0) return;
@@ -108,7 +109,8 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `access_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+    const filename = `${currentRoom ? currentRoom.name : 'access'}_logs_${selectedDate || 'all'}.csv`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -117,18 +119,37 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
   return (
     <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <History size={24} color="var(--accent-cyan)" />
-            Audit & Access History
-          </h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>
+              {currentRoom ? `${currentRoom.name} — Access Logs` : 'Audit & Access History'}
+            </h1>
+            {currentRoom && (
+              <span className={`badge ${currentRoom.is_online ? 'badge-active' : 'badge-inactive'}`}>
+                {currentRoom.is_online ? 'ONLINE' : 'OFFLINE'}
+              </span>
+            )}
+          </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            Tamper-evident log of all biometric scans and door unlocks across all rooms.
+            {currentRoom 
+              ? `Live attendance and biometric scan audit trail recorded at ${currentRoom.name} (${currentRoom.location || 'Location unassigned'}).`
+              : 'Tamper-evident log of all biometric scans and door unlocks across all rooms.'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          {currentRoom && onSwitchToUsers && (
+            <button
+              onClick={onSwitchToUsers}
+              className="btn btn-secondary btn-sm"
+              title={`View enrolled users for ${currentRoom.name}`}
+            >
+              <span>{currentRoom.name} User Directory</span>
+            </button>
+          )}
+
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className="btn btn-secondary btn-sm"
@@ -166,7 +187,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
                 type="text"
                 className="input"
                 style={{ paddingLeft: 34, fontSize: 13 }}
-                placeholder="e.g. John Doe, FUN_LAB"
+                placeholder="e.g. John Doe, CRF_LAB_1"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -175,19 +196,35 @@ export default function Logs({ selectedRoomId = '', onSelectRoom }) {
 
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 4, textTransform: 'uppercase' }}>
-              Filter by Room
+              Room
             </label>
-            <select
-              className="input"
-              style={{ fontSize: 13 }}
-              value={deviceId}
-              onChange={(e) => { setDeviceId(e.target.value); setPage(1); }}
-            >
-              <option value="">All Hardware Units</option>
-              {devices.map((d) => (
-                <option key={d.id} value={d.id}>{d.name}</option>
-              ))}
-            </select>
+            {currentRoom ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 42 }}>
+                <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: '#fff', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                  {currentRoom.name}
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => { setDeviceId(''); setPage(1); }}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: 11, padding: '3px 8px' }}
+                >
+                  All Rooms
+                </button>
+              </div>
+            ) : (
+              <select
+                className="input"
+                style={{ fontSize: 13 }}
+                value={deviceId}
+                onChange={(e) => { setDeviceId(e.target.value); setPage(1); }}
+              >
+                <option value="">All Hardware Units</option>
+                {devices.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { X, Fingerprint } from 'lucide-react';
 
-export default function UserModal({ user, devices = [], autoDetected = null, onClose, onSave }) {
+export default function UserModal({ user, devices = [], defaultDeviceId = null, autoDetected = null, onClose, onSave }) {
   const isNew = !user;
 
   const initialFp = user?.fingerprint_id ?? (autoDetected?.fingerprint_id ?? '');
   const [fingerprintId, setFingerprintId] = useState(initialFp);
-  const [deviceId, setDeviceId] = useState(user?.device_id ?? (autoDetected?.device_id ?? devices[0]?.id ?? ''));
+  const [deviceId, setDeviceId] = useState(user?.device_id ?? (autoDetected?.device_id ?? defaultDeviceId ?? devices[0]?.id ?? ''));
   const [name, setName] = useState(user?.name ?? '');
   const computeRole = (fp) => (parseInt(fp, 10) <= 3 ? 'admin' : 'member');
   const [role, setRole] = useState(initialFp !== '' ? computeRole(initialFp) : 'member');
@@ -42,7 +42,7 @@ export default function UserModal({ user, devices = [], autoDetected = null, onC
   };
 
   const detectedDeviceName = autoDetected?.device_name
-    || devices.find(d => d.id === autoDetected?.device_id)?.name || '';
+    || devices.find(d => String(d.id) === String(deviceId))?.name || '';
 
   return (
     <div className="modal-overlay" onClick={onClose}>

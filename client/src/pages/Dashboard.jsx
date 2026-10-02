@@ -9,6 +9,7 @@ import {
   Code, 
   ShieldCheck, 
   Users, 
+  History,
   RefreshCw, 
   CheckCircle2, 
   AlertCircle,
@@ -17,7 +18,7 @@ import {
 import { api } from '../api';
 import FirmwareModal from '../components/FirmwareModal';
 
-export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSelectRoom }) {
+export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSelectRoom, onNavigateToRoom }) {
   const [devices, setDevices] = useState([]);
   const [recentLogs, setRecentLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -291,14 +292,35 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
                       </p>
                     </div>
 
-                    <button
-                      onClick={() => setActiveFirmwareDevice(device)}
-                      className="btn btn-secondary btn-sm"
-                      title="View Arduino / ESP32 Configuration Code"
-                    >
-                      <Code size={13} />
-                      <span>Firmware Code</span>
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'logs')}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: 11, padding: '5px 10px' }}
+                        title={`View Access Logs for ${device.name}`}
+                      >
+                        <History size={12} color="var(--accent-cyan)" />
+                        <span>Logs</span>
+                      </button>
+                      <button
+                        onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'users')}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: 11, padding: '5px 10px' }}
+                        title={`View User Directory for ${device.name}`}
+                      >
+                        <Users size={12} color="var(--accent-indigo)" />
+                        <span>Users</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveFirmwareDevice(device)}
+                        className="btn btn-secondary btn-sm"
+                        style={{ padding: '5px 10px', fontSize: 11 }}
+                        title="View Arduino / ESP32 Configuration Code"
+                      >
+                        <Code size={12} />
+                        <span>Firmware</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Device Meta Info */}

@@ -6,13 +6,15 @@ import {
   Trash2, 
   Code, 
   MapPin, 
-  Clock 
+  Clock,
+  History,
+  Users
 } from 'lucide-react';
 import { api } from '../api';
 import DeviceModal from '../components/DeviceModal';
 import FirmwareModal from '../components/FirmwareModal';
 
-export default function Devices() {
+export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,17 +44,19 @@ export default function Devices() {
     } else {
       await api.createDevice(data);
     }
-    loadDevices();
+    await loadDevices();
+    if (onDevicesUpdated) onDevicesUpdated();
   };
 
   const handleDeleteDevice = async (device) => {
-    if (!window.confirm(`Delete room unit "${device.name}"? This will remove all associated user mappings.`)) {
+    if (!window.confirm(`Delete room unit "${device.name}"? This will remove all associated user mappings and logs.`)) {
       return;
     }
 
     try {
       await api.deleteDevice(device.id);
-      loadDevices();
+      await loadDevices();
+      if (onDevicesUpdated) onDevicesUpdated();
     } catch (err) {
       alert(`Delete failed: ${err.message}`);
     }
@@ -131,23 +135,46 @@ export default function Devices() {
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
-              <button
-                onClick={() => { setEditingDevice(device); setModalOpen(true); }}
-                className="btn btn-secondary btn-sm"
-                title="Edit Room Details"
-              >
-                <Edit3 size={13} />
-                <span>Edit</span>
-              </button>
-              <button
-                onClick={() => handleDeleteDevice(device)}
-                className="btn btn-danger btn-sm"
-                title="Delete Room Unit"
-              >
-                <Trash2 size={13} />
-                <span>Delete</span>
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 14, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'logs')}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: 11, padding: '5px 10px' }}
+                  title={`Open Access Logs for ${device.name}`}
+                >
+                  <History size={12} color="var(--accent-cyan)" />
+                  <span>Access Logs</span>
+                </button>
+                <button
+                  onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'users')}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: 11, padding: '5px 10px' }}
+                  title={`Open User Directory for ${device.name}`}
+                >
+                  <Users size={12} color="var(--accent-indigo)" />
+                  <span>Users ({device.user_count || 0})</span>
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  onClick={() => { setEditingDevice(device); setModalOpen(true); }}
+                  className="btn btn-secondary btn-sm"
+                  style={{ padding: '5px 8px' }}
+                  title="Edit Room Details"
+                >
+                  <Edit3 size={13} />
+                </button>
+                <button
+                  onClick={() => handleDeleteDevice(device)}
+                  className="btn btn-danger btn-sm"
+                  style={{ padding: '5px 8px' }}
+                  title="Delete Room Unit"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             </div>
           </div>
         ))}
