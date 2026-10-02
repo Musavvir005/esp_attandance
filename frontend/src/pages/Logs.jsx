@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  History, 
-  Search, 
-  Filter, 
-  RefreshCw, 
-  ChevronLeft, 
-  ChevronRight, 
-  Calendar, 
-  ShieldCheck, 
-  UserCheck, 
+import {
+  History,
+  Search,
+  Filter,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  ShieldCheck,
+  UserCheck,
   UserX,
   FileSpreadsheet
 } from 'lucide-react';
@@ -133,7 +133,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
             )}
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            {currentRoom 
+            {currentRoom
               ? `Live attendance and biometric scan audit trail recorded at ${currentRoom.name}${currentRoom.location && currentRoom.location.trim() ? ` (${currentRoom.location})` : ''}.`
               : 'Tamper-evident log of all biometric scans and door unlocks across all rooms.'}
           </p>
@@ -187,7 +187,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 type="text"
                 className="input"
                 style={{ paddingLeft: 34, fontSize: 13 }}
-                placeholder="e.g. John Doe, CRF_LAB_1"
+                placeholder="e.g.Doremon , FUN_LAB"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -203,7 +203,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
                   {currentRoom.name}
                 </span>
-                <button 
+                <button
                   type="button"
                   onClick={() => { setDeviceId(''); setPage(1); }}
                   className="btn btn-secondary btn-sm"
@@ -256,7 +256,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 onClick={() => {
                   try {
                     dateInputRef.current?.showPicker();
-                  } catch (err) {}
+                  } catch (err) { }
                 }}
               >
                 <Calendar
@@ -279,7 +279,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                   onClick={(e) => {
                     try {
                       e.target.showPicker();
-                    } catch (err) {}
+                    } catch (err) { }
                   }}
                 />
               </div>
