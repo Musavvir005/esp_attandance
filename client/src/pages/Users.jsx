@@ -104,7 +104,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             {currentRoom 
-              ? `Manage fingerprint slots (1-127) and authorized identities for ${currentRoom.name} (${currentRoom.location || 'Location unassigned'}).`
+              ? `Manage fingerprint slots (1-127) and authorized identities for ${currentRoom.name}${currentRoom.location && currentRoom.location.trim() ? ` (${currentRoom.location})` : ''}.`
               : 'Map sensor hardware fingerprint IDs (1-127) to human identities and permissions across all units.'}
           </p>
         </div>

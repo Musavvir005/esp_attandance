@@ -134,7 +134,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             {currentRoom 
-              ? `Live attendance and biometric scan audit trail recorded at ${currentRoom.name} (${currentRoom.location || 'Location unassigned'}).`
+              ? `Live attendance and biometric scan audit trail recorded at ${currentRoom.name}${currentRoom.location && currentRoom.location.trim() ? ` (${currentRoom.location})` : ''}.`
               : 'Tamper-evident log of all biometric scans and door unlocks across all rooms.'}
           </p>
         </div>

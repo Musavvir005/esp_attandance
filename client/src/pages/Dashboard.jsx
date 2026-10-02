@@ -287,9 +287,11 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
                           DIR: {device.name}
                         </span>
                       </div>
-                      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                        {device.location || 'Hardware room / entryway'}
-                      </p>
+                      {device.location && device.location.trim() && (
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                          {device.location}
+                        </p>
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

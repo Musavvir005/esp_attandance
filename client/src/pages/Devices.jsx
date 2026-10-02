@@ -105,10 +105,12 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
                     {device.is_online ? 'ONLINE' : 'OFFLINE'}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                  <MapPin size={13} color="var(--text-dim)" />
-                  <span>{device.location || 'Location unassigned'}</span>
-                </div>
+                {device.location && device.location.trim() && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+                    <MapPin size={13} color="var(--text-dim)" />
+                    <span>{device.location}</span>
+                  </div>
+                )}
               </div>
 
               <button

@@ -151,7 +151,7 @@ export default function RoomBar({
               </span>
             </div>
 
-            {currentDevice.location && (
+            {currentDevice.location && currentDevice.location.trim() && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)' }}>
                 <MapPin size={13} color="var(--text-dim)" />
                 <span>{currentDevice.location}</span>

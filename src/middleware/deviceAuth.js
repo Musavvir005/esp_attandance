@@ -29,7 +29,7 @@ async function deviceAuth(req, res, next) {
          VALUES ($1, $2, $3)
          ON CONFLICT (name) DO UPDATE SET last_seen_at = NOW()
          RETURNING id, name, location`,
-        [cleanDir, generatedSecret, 'Auto-Registered Unit']
+        [cleanDir, generatedSecret, null]
       );
     }
 
