@@ -11,9 +11,9 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: ADMIN_USERNAME
-        value: admin
+        value: SRM_srm
       - key: ADMIN_PASSWORD
-        value: admin123
+        value: srm@bio
       - key: JWT_SECRET
         generateValue: true
       - key: RATE_LIMIT_CHECK_PER_MINUTE
