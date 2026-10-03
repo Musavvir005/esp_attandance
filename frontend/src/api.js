@@ -57,6 +57,7 @@ export const api = {
   createUser: (payload) => request('/users', { method: 'POST', body: payload }),
   updateUser: (id, payload) => request(`/users/${id}`, { method: 'PUT', body: payload }),
   deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
+  prefillUsers: (payload) => request('/users/prefill', { method: 'POST', body: payload }),
 
   // Access Logs
   getLogs: (params = {}) => {

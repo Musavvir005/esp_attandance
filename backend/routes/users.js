@@ -13,6 +13,29 @@ router.get('/', async (req, res) => {
   const { device_id } = req.query;
 
   try {
+    // Automatically backfill any scanned IDs and all sequential slots (1..MAX) from access_logs
+    try {
+      await db.query(`
+        INSERT INTO users (fingerprint_id, device_id, name, role, active)
+        SELECT 
+          s.slot as fingerprint_id,
+          m.device_id,
+          'Unknown User #' || s.slot as name,
+          CASE WHEN s.slot <= 3 THEN 'admin' ELSE 'member' END as role,
+          true as active
+        FROM (
+          SELECT device_id, GREATEST(MAX(fingerprint_id), 1) as max_slot
+          FROM access_logs
+          WHERE fingerprint_id >= 1 AND fingerprint_id <= 127
+          GROUP BY device_id
+        ) m
+        CROSS JOIN LATERAL generate_series(1, LEAST(m.max_slot, 127)) as s(slot)
+        ON CONFLICT (device_id, fingerprint_id) DO NOTHING
+      `);
+    } catch (backfillErr) {
+      console.warn('Notice: user backfill from access_logs skipped or failed:', backfillErr.message);
+    }
+
     let sql = `
       SELECT 
         u.id,
@@ -41,6 +64,49 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Error fetching users:', err);
     return res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+/**
+ * POST /api/users/prefill
+ * Pre-populate slot IDs (e.g. slots 1 to count) as "Unknown User #ID" for a device
+ */
+router.post('/prefill', async (req, res) => {
+  const { device_id, count = 10, start = 1 } = req.body || {};
+  const devId = parseInt(device_id, 10);
+  const total = Math.min(127, Math.max(1, parseInt(count, 10) || 10));
+  const startSlot = Math.min(127, Math.max(1, parseInt(start, 10) || 1));
+
+  if (isNaN(devId)) {
+    return res.status(400).json({ error: 'Valid device_id is required' });
+  }
+
+  try {
+    const endSlot = Math.min(127, startSlot + total - 1);
+    let createdCount = 0;
+
+    for (let slot = startSlot; slot <= endSlot; slot++) {
+      const defaultRole = slot <= 3 ? 'admin' : 'member';
+      const defaultName = `Unknown User #${slot}`;
+      const r = await db.query(
+        `INSERT INTO users (fingerprint_id, device_id, name, role, active)
+         VALUES ($1, $2, $3, $4, true)
+         ON CONFLICT (device_id, fingerprint_id) DO NOTHING
+         RETURNING id`,
+        [slot, devId, defaultName, defaultRole]
+      );
+      if (r.rows && r.rows.length > 0) {
+        createdCount++;
+      }
+    }
+
+    return res.json({
+      message: `Pre-filled slots #${startSlot} to #${endSlot}. Added ${createdCount} new slot(s).`,
+      added: createdCount,
+    });
+  } catch (err) {
+    console.error('Error pre-filling users:', err);
+    return res.status(500).json({ error: 'Failed to pre-fill user slots' });
   }
 });
 

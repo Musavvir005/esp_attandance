@@ -369,7 +369,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                     </td>
 
                     <td>
-                      {isRegistered ? (
+                      {isRegistered && !log.user_name.toLowerCase().startsWith('unknown') ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{log.user_name}</span>
                           {!log.user_active && (
@@ -378,7 +378,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                         </div>
                       ) : (
                         <span style={{ color: 'var(--accent-amber, #f59e0b)', fontStyle: 'italic' }}>
-                          ⚠ Unknown User
+                          ⚠ {log.user_name || 'Unknown User'}
                         </span>
                       )}
                     </td>

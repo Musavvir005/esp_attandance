@@ -40,6 +40,22 @@ router.get('/log', logLimiter, deviceAuth, async (req, res) => {
       ]
     );
 
+    // Auto-create all enrolled user slots (1 to fingerprintId) as "Unknown User #<ID>" if not already mapped
+    if (fingerprintId <= 127) {
+      await db.query(
+        `INSERT INTO users (fingerprint_id, device_id, name, role, active)
+         SELECT 
+           s.slot,
+           $1,
+           'Unknown User #' || s.slot,
+           CASE WHEN s.slot <= 3 THEN 'admin' ELSE 'member' END,
+           true
+         FROM generate_series(1, LEAST($2::int, 127)) as s(slot)
+         ON CONFLICT (device_id, fingerprint_id) DO NOTHING`,
+        [req.device.id, fingerprintId]
+      );
+    }
+
     return res.status(200).type('text/plain').send('OK');
   } catch (err) {
     console.error('Error recording access log:', err);
