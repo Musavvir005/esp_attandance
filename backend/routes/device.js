@@ -101,4 +101,41 @@ router.get('/check-unlock', checkUnlockLimiter, deviceAuth, async (req, res) => 
   }
 });
 
+/**
+ * GET /enroll?id=5&dir=FUN_LAB
+ * Called by ESP32 immediately after a new fingerprint is enrolled into sensor flash.
+ * Creates Unknown User slots for IDs 1..id so they appear in User Directory instantly
+ * — without waiting for a login/scan event.
+ */
+router.get('/enroll', logLimiter, deviceAuth, async (req, res) => {
+  const { id } = req.query;
+
+  const fingerprintId = parseInt(id, 10);
+  if (isNaN(fingerprintId) || fingerprintId < 1 || fingerprintId > 127) {
+    return res.status(400).type('text/plain').send('Bad Request: Invalid fingerprint ID (must be 1-127)');
+  }
+
+  try {
+    // Create Unknown User slots for IDs 1 through fingerprintId (no duplicates)
+    const result = await db.query(
+      `INSERT INTO users (fingerprint_id, device_id, name, role, active)
+       SELECT 
+         s.slot,
+         $1,
+         'Unknown User #' || s.slot,
+         CASE WHEN s.slot <= 3 THEN 'admin' ELSE 'member' END,
+         true
+       FROM generate_series(1, LEAST($2::int, 127)) as s(slot)
+       ON CONFLICT (device_id, fingerprint_id) DO NOTHING`,
+      [req.device.id, fingerprintId]
+    );
+
+    console.log(`[Enroll] Device '${req.device.name}': synced slots 1-${fingerprintId} (${result.rowCount} new)`);
+    return res.status(200).type('text/plain').send('OK');
+  } catch (err) {
+    console.error('Error processing enrollment sync:', err);
+    return res.status(500).type('text/plain').send('Internal Server Error');
+  }
+});
+
 module.exports = router;

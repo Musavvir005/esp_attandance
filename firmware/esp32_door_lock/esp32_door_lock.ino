@@ -16,6 +16,7 @@ const char* password = "I0T#2o24L@b";
 
 // ================= BACKEND =================
 const char* server_url  = "https://esp-attandance.vercel.app/log";
+const char* enroll_url  = "https://esp-attandance.vercel.app/enroll";
 const char* unlock_url  = "https://esp-attandance.vercel.app/check-unlock";
 
 // ================= ROOM =================
@@ -55,6 +56,7 @@ int findNextAvailableID();
 bool scanAndEnroll(int id);
 bool isAdmin(int id);
 void sendToServer(int id);
+void sendEnrollToServer(int id);  // notifies cloud of newly enrolled fingerprint slot
 void checkUnlock();          // polls backend for remote unlock commands
 
 // ================= SETUP =================
@@ -148,6 +150,7 @@ void loop() {
       if (scanAndEnroll(newID)) {
         beepThrice(100, 100, 100);
         displayMessage("ENROLLED OK", ("ID: " + String(newID)).c_str(), 2000);
+        sendEnrollToServer(newID);  // ← notify cloud immediately
       } else {
         beepTwice(150, 150);
         displayMessage("EXIT ADMIN", "TIMEOUT / CANCEL", 2000);
@@ -217,6 +220,7 @@ if (finger.templateCount == 0) {
   if (scanAndEnroll(newID)) {
     beepThrice(100,100,100);
     displayMessage("ADMIN ADDED", String(newID).c_str(), 2000);
+    sendEnrollToServer(newID);  // ← notify cloud immediately
   } else {
     beepTwice(150,150);
     displayMessage("FAILED", "", 2000);
@@ -422,6 +426,38 @@ void sendToServer(int id) {
     Serial.println("[HTTP] Response: " + resp);
   } else {
     Serial.printf("[HTTP] Upload failed: %s (code %d)\n", http.errorToString(code).c_str(), code);
+  }
+  http.end();
+}
+
+// ─── notify cloud of a newly enrolled fingerprint slot ────────────────────────
+void sendEnrollToServer(int id) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("[HTTP] Cannot send enroll: WiFi not connected!");
+    return;
+  }
+
+  String url = String(enroll_url) +
+    "?id="  + String(id) +
+    "&dir=" + String(DIR_NAME);
+
+  Serial.println("[HTTP] Notifying cloud of enrollment...");
+  Serial.println("[HTTP] GET: " + url);
+
+  WiFiClientSecure client;
+  client.setInsecure();
+
+  HTTPClient http;
+  http.begin(client, url);
+  http.setTimeout(4000);
+  int code = http.GET();
+
+  if (code > 0) {
+    Serial.printf("[HTTP] Enroll synced! HTTP Status: %d\n", code);
+    String resp = http.getString();
+    Serial.println("[HTTP] Response: " + resp);
+  } else {
+    Serial.printf("[HTTP] Enroll sync failed: %s (code %d)\n", http.errorToString(code).c_str(), code);
   }
   http.end();
 }

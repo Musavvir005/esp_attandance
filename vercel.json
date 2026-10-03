@@ -16,6 +16,10 @@
       "destination": "https://esp-attandance.onrender.com/check-unlock"
     },
     {
+      "source": "/enroll",
+      "destination": "https://esp-attandance.onrender.com/enroll"
+    },
+    {
       "source": "/health",
       "destination": "https://esp-attandance.onrender.com/health"
     },

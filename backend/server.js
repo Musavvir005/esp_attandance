@@ -57,7 +57,7 @@ if (fs.existsSync(frontendDistPath)) {
   app.use(express.static(frontendDistPath));
   app.get('*', (req, res, next) => {
     // Skip API routes
-    if (req.path.startsWith('/api') || req.path === '/log' || req.path === '/check-unlock' || req.path === '/health') {
+    if (req.path.startsWith('/api') || req.path === '/log' || req.path === '/check-unlock' || req.path === '/enroll' || req.path === '/health') {
       return next();
     }
     res.sendFile(path.join(frontendDistPath, 'index.html'));
