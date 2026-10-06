@@ -13,29 +13,6 @@ router.get('/', async (req, res) => {
   const { device_id } = req.query;
 
   try {
-    // Automatically backfill any scanned IDs and all sequential slots (1..MAX) from access_logs
-    try {
-      await db.query(`
-        INSERT INTO users (fingerprint_id, device_id, name, role, active)
-        SELECT 
-          s.slot as fingerprint_id,
-          m.device_id,
-          'Unknown User #' || s.slot as name,
-          CASE WHEN s.slot <= 3 THEN 'admin' ELSE 'member' END as role,
-          true as active
-        FROM (
-          SELECT device_id, GREATEST(MAX(fingerprint_id), 1) as max_slot
-          FROM access_logs
-          WHERE fingerprint_id >= 1 AND fingerprint_id <= 127
-          GROUP BY device_id
-        ) m
-        CROSS JOIN LATERAL generate_series(1, LEAST(m.max_slot, 127)) as s(slot)
-        ON CONFLICT (device_id, fingerprint_id) DO NOTHING
-      `);
-    } catch (backfillErr) {
-      console.warn('Notice: user backfill from access_logs skipped or failed:', backfillErr.message);
-    }
-
     let sql = `
       SELECT 
         u.id,
@@ -101,21 +78,22 @@ router.post('/prefill', async (req, res) => {
     }
 
     return res.json({
-      message: `Pre-filled slots #${startSlot} to #${endSlot}. Added ${createdCount} new slot(s).`,
-      added: createdCount,
+      success: true,
+      createdCount,
+      message: `Generated slots ${startSlot} to ${endSlot} for room #${devId}`,
     });
   } catch (err) {
-    console.error('Error pre-filling users:', err);
-    return res.status(500).json({ error: 'Failed to pre-fill user slots' });
+    console.error('Error prefilling users:', err);
+    return res.status(500).json({ error: 'Failed to prefill user slots' });
   }
 });
 
 /**
  * POST /api/users
- * Map a new fingerprint_id to a user
+ * Create or assign a user to a fingerprint ID and device
  */
 router.post('/', async (req, res) => {
-  const { fingerprint_id, device_id, name, role, active } = req.body || {};
+  const { fingerprint_id, device_id, name, role = 'member', active = true } = req.body || {};
 
   const fpId = parseInt(fingerprint_id, 10);
   const devId = parseInt(device_id, 10);
