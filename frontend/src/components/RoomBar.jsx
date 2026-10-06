@@ -7,7 +7,6 @@ import {
   Unlock, 
   MapPin, 
   Clock, 
-  ChevronRight,
   ShieldCheck,
   CheckCircle2,
   AlertCircle
@@ -73,10 +72,10 @@ export default function RoomBar({
   return (
     <div className="room-bar-wrapper">
       <div className="room-bar-content">
-        {/* Dynamic Rooms List */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-dim)', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>
-            <Layers size={14} color="var(--accent-cyan)" />
+        {/* Dynamic Rooms Horizontal Strip */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', flexShrink: 0 }}>
+            <Layers size={13} color="var(--accent-cyan)" />
             <span>ROOMS:</span>
           </div>
 
@@ -93,35 +92,35 @@ export default function RoomBar({
                     }
                   }}
                   className={`room-pill ${isSelected ? 'active' : ''}`}
-                  title={`Open dedicated workspace for ${device.name}`}
+                  title={`Open workspace for ${device.name}`}
                 >
-                  <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} />
+                  <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} style={{ width: 6, height: 6 }} />
                   <span>{device.name}</span>
                   <span className="room-user-count-badge">
-                    {device.user_count || 0} users
+                    {device.user_count || 0}
                   </span>
                 </button>
               );
             })}
 
             {devices.length === 0 && (
-              <span style={{ fontSize: 12, color: 'var(--text-dim)', fontStyle: 'italic' }}>
-                No rooms registered yet
+              <span style={{ fontSize: 11, color: 'var(--text-dim)', fontStyle: 'italic', padding: '4px 0' }}>
+                No rooms registered
               </span>
             )}
           </div>
         </div>
 
         {/* Quick Add Room Button */}
-        <div>
+        <div style={{ flexShrink: 0 }}>
           <button
             onClick={onOpenAddRoom}
             className="btn btn-secondary btn-sm"
-            style={{ fontSize: 12, padding: '6px 12px', gap: 6 }}
+            style={{ fontSize: 11, padding: '5px 10px', gap: 4 }}
             title="Register a new room unit"
           >
-            <Plus size={14} color="var(--accent-cyan)" />
-            <span>Add Room</span>
+            <Plus size={13} color="var(--accent-cyan)" />
+            <span>Add</span>
           </button>
         </div>
       </div>
@@ -130,58 +129,56 @@ export default function RoomBar({
       {isRoomWorkspace && (
         <div style={{
           maxWidth: 1300,
-          margin: '12px auto 0 auto',
-          paddingTop: 12,
-          borderTop: '1px solid rgba(148, 163, 184, 0.08)',
+          margin: '8px auto 0 auto',
+          paddingTop: 8,
+          borderTop: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: 14,
+          gap: 8,
         }}>
           {/* Room Context Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span className={`status-dot ${currentDevice.is_online ? 'online' : 'offline'}`} />
-              <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>
                 {currentDevice.name}
               </span>
-              <span className={`badge ${currentDevice.is_online ? 'badge-active' : 'badge-inactive'}`} style={{ fontSize: 10, padding: '1px 7px' }}>
+              <span className={`badge ${currentDevice.is_online ? 'badge-active' : 'badge-inactive'}`} style={{ fontSize: 9, padding: '1px 5px' }}>
                 {currentDevice.is_online ? 'ONLINE' : 'OFFLINE'}
               </span>
             </div>
 
             {currentDevice.location && currentDevice.location.trim() && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)' }}>
-                <MapPin size={13} color="var(--text-dim)" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: 'var(--text-muted)' }}>
+                <MapPin size={11} color="var(--text-dim)" />
                 <span>{currentDevice.location}</span>
               </div>
             )}
-
-            <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-              <span>{currentDevice.user_count || 0} Enrolled Identities</span>
-            </div>
           </div>
 
           {/* Sub-Tabs for this Room */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             <div className="room-subnav">
               <button
                 onClick={() => setActiveTab('logs')}
                 className={`room-subnav-btn ${activeTab === 'logs' ? 'active' : ''}`}
+                style={{ padding: '5px 10px', fontSize: 11.5 }}
                 title={`View access logs for ${currentDevice.name}`}
               >
-                <History size={15} />
-                <span>Access Logs</span>
+                <History size={13} />
+                <span>Logs</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('users')}
                 className={`room-subnav-btn ${activeTab === 'users' ? 'active' : ''}`}
+                style={{ padding: '5px 10px', fontSize: 11.5 }}
                 title={`View user directory for ${currentDevice.name}`}
               >
-                <Users size={15} />
-                <span>User Directory</span>
+                <Users size={13} />
+                <span>Users ({currentDevice.user_count || 0})</span>
               </button>
             </div>
 
@@ -191,8 +188,8 @@ export default function RoomBar({
               disabled={unlockStatus?.status === 'dispatched' || unlockStatus?.status === 'unlocked'}
               className="btn btn-primary btn-sm"
               style={{
-                fontSize: 12,
-                padding: '8px 14px',
+                fontSize: 11.5,
+                padding: '5px 10px',
                 background: unlockStatus?.status === 'unlocked' ? 'var(--accent-emerald)' : undefined,
                 borderColor: unlockStatus?.status === 'unlocked' ? 'var(--accent-emerald)' : undefined,
               }}
@@ -200,18 +197,18 @@ export default function RoomBar({
             >
               {unlockStatus?.status === 'dispatched' ? (
                 <>
-                  <Clock size={14} className="unlocking-active" />
-                  <span>Signaling ESP32...</span>
+                  <Clock size={12} className="unlocking-active" />
+                  <span>Signaling...</span>
                 </>
               ) : unlockStatus?.status === 'unlocked' ? (
                 <>
-                  <CheckCircle2 size={14} />
+                  <CheckCircle2 size={12} />
                   <span>Unlocked ({unlockStatus.countdown}s)</span>
                 </>
               ) : (
                 <>
-                  <Unlock size={14} />
-                  <span>Unlock Door</span>
+                  <Unlock size={12} />
+                  <span>Unlock</span>
                 </>
               )}
             </button>

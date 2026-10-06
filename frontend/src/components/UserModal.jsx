@@ -58,19 +58,12 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Fingerprint size={22} color="var(--accent-cyan)" />
-            <div>
-              <h3 style={{ fontSize: 18, fontWeight: 700 }}>
-                {user ? `Edit User — Slot #${user.fingerprint_id}` : 'Map Fingerprint ID to User'}
-              </h3>
-              <p style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>
-                {user ? 'Hardware slot ID is fixed. You can change the name and permissions below.' : 'Assign a name and role to a hardware slot.'}
-              </p>
-            </div>
+            <h3 style={{ fontSize: 18, fontWeight: 700 }}>
+              {user ? 'Edit Enrolled Identity' : 'Map Fingerprint Slot'}
+            </h3>
           </div>
           <button onClick={onClose} className="btn btn-secondary btn-sm" style={{ padding: 6 }}>
             <X size={16} />
@@ -78,19 +71,26 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#fecdd3', padding: '10px 14px', borderRadius: 'var(--radius-md)', fontSize: 13, marginBottom: 16 }}>
+          <div style={{
+            background: 'rgba(244, 63, 94, 0.15)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
+            color: '#fecdd3',
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 13,
+            marginBottom: 16,
+          }}>
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-
-          {/* EDIT MODE: Fixed Slot ID and Room Unit */}
           {user ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+            /* EDIT MODE: Fixed Slot & Hardware Room display */
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Fingerprint Slot (Fixed ID)
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Fixed Fingerprint Slot
                 </label>
                 <div style={{
                   display: 'flex',
@@ -99,21 +99,20 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
                   height: 40,
                   padding: '0 12px',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(56, 189, 248, 0.25)',
-                  background: 'rgba(56, 189, 248, 0.08)',
-                  fontSize: 14,
-                  color: 'var(--accent-cyan)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(255,255,255,0.04)',
+                  fontSize: 13,
+                  color: 'var(--text-main)',
                   fontWeight: 700,
                 }}>
-                  <Lock size={14} color="var(--accent-cyan)" />
-                  <span>Slot #{user.fingerprint_id}</span>
-                  <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-dim)', fontWeight: 400 }}>Fixed</span>
+                  <Fingerprint size={16} color="var(--accent-cyan)" />
+                  <span>SLOT #{user.fingerprint_id}</span>
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Assigned Room Unit
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Associated Room Unit
                 </label>
                 <div style={{
                   display: 'flex',
@@ -137,7 +136,7 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
             </div>
           ) : autoDetected ? (
             /* NEW MODE WITH AUTO-DETECTED SCAN */
-            <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
               <div style={{ background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)', borderRadius: 8, padding: '8px 14px', fontSize: 13 }}>
                 <span style={{ color: 'var(--text-dim)', marginRight: 6 }}>Detected Slot:</span>
                 <strong style={{ color: 'var(--accent-cyan)' }}>#{autoDetected.fingerprint_id}</strong>
@@ -149,9 +148,9 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
             </div>
           ) : (
             /* NEW MODE: Manual slot selection */
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Fingerprint Slot (1-127)</label>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Fingerprint Slot (1-127)</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -163,7 +162,7 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Assigned Unit / Room</label>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Assigned Unit / Room</label>
                 <select className="input" value={deviceId} onChange={(e) => setDeviceId(e.target.value)} required>
                   {devices.map((d) => (
                     <option key={d.id} value={d.id}>{d.name} {d.location ? `(${d.location})` : ''}</option>
@@ -173,10 +172,10 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
             </div>
           )}
 
-          {/* Full Name field — always editable */}
+          {/* Full Name field */}
           <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: 4 }}>
+              <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-muted)' }}>
                 Full Name
               </label>
               {isUnknownName && (
@@ -190,7 +189,7 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
               className="input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Doremon, Nobita, John Doe"
+              placeholder="e.g. SRM Admin, Alice, John Doe"
               autoFocus
               onFocus={(e) => {
                 if (isUnknownName) e.target.select();
@@ -204,10 +203,10 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
           </div>
 
           {/* Role + Status */}
-          <div style={{ display: 'grid', gridTemplateColumns: user ? '1fr 1fr' : '1fr', gap: 14, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: user ? 'repeat(auto-fit, minmax(180px, 1fr))' : '1fr', gap: 12, marginBottom: 20 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Access Role</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 40, padding: '0 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', fontSize: 14, color: role === 'admin' ? '#a78bfa' : 'var(--accent-cyan)', fontWeight: 600 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Access Role</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 40, padding: '0 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', fontSize: 13, color: role === 'admin' ? '#a78bfa' : 'var(--accent-cyan)', fontWeight: 600 }}>
                 <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: role === 'admin' ? '#a78bfa' : 'var(--accent-cyan)', flexShrink: 0 }} />
                 {role === 'admin' ? 'Administrator' : 'Member'}
                 <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)', fontWeight: 400 }}>
@@ -217,7 +216,7 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
             </div>
             {user && (
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Status</label>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Status</label>
                 <select className="input" value={active ? 'true' : 'false'} onChange={(e) => setActive(e.target.value === 'true')}>
                   <option value="true">Active (Allowed)</option>
                   <option value="false">Suspended (Blocked)</option>
@@ -226,10 +225,10 @@ export default function UserModal({ user, devices = [], defaultDeviceId = null, 
             )}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap' }}>
             <button type="button" onClick={onClose} className="btn btn-secondary">Cancel</button>
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Saving...' : (user ? 'Update User Name' : 'Save Mapping')}
+              {loading ? 'Saving...' : (user ? 'Update User' : 'Save Mapping')}
             </button>
           </div>
         </form>

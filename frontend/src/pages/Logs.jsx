@@ -117,13 +117,13 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
   };
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
+    <div className="page-container">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 14 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <History size={24} color="var(--accent-cyan)" />
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <History size={22} color="var(--accent-cyan)" />
+            <h1 style={{ fontSize: 'clamp(18px, 3.5vw, 22px)', fontWeight: 800, color: 'var(--text-main)' }}>
               {currentRoom ? `${currentRoom.name} — Access Logs` : 'Audit & Access History'}
             </h1>
             {currentRoom && (
@@ -134,19 +134,19 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             {currentRoom
-              ? `Live attendance and biometric scan audit trail recorded at ${currentRoom.name}${currentRoom.location && currentRoom.location.trim() ? ` (${currentRoom.location})` : ''}.`
+              ? `Live attendance and biometric scan audit trail for ${currentRoom.name}${currentRoom.location && currentRoom.location.trim() ? ` (${currentRoom.location})` : ''}.`
               : 'Tamper-evident log of all biometric scans and door unlocks across all rooms.'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {currentRoom && onSwitchToUsers && (
             <button
               onClick={onSwitchToUsers}
               className="btn btn-secondary btn-sm"
               title={`View enrolled users for ${currentRoom.name}`}
             >
-              <span>{currentRoom.name} User Directory</span>
+              <span>{currentRoom.name} Users</span>
             </button>
           )}
 
@@ -158,22 +158,22 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
               color: autoRefresh ? 'var(--accent-emerald)' : undefined,
             }}
           >
-            <RefreshCw size={14} className={autoRefresh ? 'unlocking-active' : ''} />
-            <span>{autoRefresh ? 'Live Polling: ON' : 'Live Polling: Paused'}</span>
+            <RefreshCw size={13} className={autoRefresh ? 'unlocking-active' : ''} />
+            <span>{autoRefresh ? 'Live Polling: ON' : 'Polling: Paused'}</span>
           </button>
 
           <button onClick={exportCSV} className="btn btn-secondary btn-sm">
-            <FileSpreadsheet size={14} />
+            <FileSpreadsheet size={13} />
             <span>Export CSV</span>
           </button>
         </div>
       </div>
 
       {/* Filter Control Bar */}
-      <div className="glass-panel" style={{ padding: 18, marginBottom: 20 }}>
+      <div className="glass-panel" style={{ padding: '16px clamp(12px, 2.5vw, 18px)', marginBottom: 20 }}>
         <form onSubmit={handleSearch} style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) auto',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr)) auto',
           gap: 12,
           alignItems: 'end',
         }}>
@@ -187,7 +187,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 type="text"
                 className="input"
                 style={{ paddingLeft: 34, fontSize: 13 }}
-                placeholder="e.g. Doremon, FUN_LAB"
+                placeholder="e.g. SRM, FUN_LAB"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -200,7 +200,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
             </label>
             {currentRoom ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 42 }}>
-                <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                <span className="mono-tag" style={{ fontSize: 12, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
                   {currentRoom.name}
                 </span>
                 <button
@@ -236,7 +236,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
               inputMode="numeric"
               className="input"
               style={{ fontSize: 13 }}
-              placeholder="Type slot # (e.g. 17)"
+              placeholder="Slot # (e.g. 17)"
               value={fingerprintId}
               onChange={(e) => {
                 const val = e.target.value.replace(/[^0-9]/g, '');
@@ -248,7 +248,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
 
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 4, textTransform: 'uppercase' }}>
-              Select Date (Calendar)
+              Date (Calendar)
             </label>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div
@@ -260,7 +260,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                 }}
               >
                 <Calendar
-                  size={16}
+                  size={15}
                   color="var(--accent-cyan)"
                   style={{ position: 'absolute', left: 12, top: 12, pointerEvents: 'none', zIndex: 2 }}
                 />
@@ -269,10 +269,9 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                   type="date"
                   className="input"
                   style={{
-                    paddingLeft: 38,
+                    paddingLeft: 36,
                     fontSize: 13,
                     cursor: 'pointer',
-                    colorScheme: 'dark',
                   }}
                   value={selectedDate}
                   onChange={(e) => { setSelectedDate(e.target.value); setPage(1); }}
@@ -294,7 +293,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                   }}
                   className="btn btn-secondary btn-sm"
                   title="Show logs from all dates"
-                  style={{ padding: '9px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ padding: '8px 10px', fontSize: 11, whiteSpace: 'nowrap' }}
                 >
                   All Dates
                 </button>
@@ -308,7 +307,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
                   }}
                   className="btn btn-secondary btn-sm"
                   title="Filter to today only"
-                  style={{ padding: '9px 12px', fontSize: 12, whiteSpace: 'nowrap', color: 'var(--accent-cyan)', borderColor: 'var(--accent-cyan)' }}
+                  style={{ padding: '8px 10px', fontSize: 11, whiteSpace: 'nowrap', color: 'var(--accent-cyan)', borderColor: 'var(--accent-cyan)' }}
                 >
                   Today
                 </button>
@@ -317,7 +316,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
           </div>
 
           <div>
-            <button type="submit" className="btn btn-primary" style={{ padding: '10px 18px', fontSize: 13 }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '10px 16px', fontSize: 13, width: '100%' }}>
               <Filter size={14} />
               <span>Apply</span>
             </button>
@@ -402,7 +401,7 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
 
               {logs.length === 0 && !loading && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: 48, color: 'var(--text-dim)' }}>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
                     No access log events match your filter criteria for {selectedDate || 'all dates'}.
                   </td>
                 </tr>
@@ -416,17 +415,19 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '16px 20px',
+          padding: '14px clamp(12px, 2.5vw, 20px)',
           borderTop: '1px solid var(--border-subtle)',
           fontSize: 13,
           color: 'var(--text-muted)',
+          flexWrap: 'wrap',
+          gap: 12,
         }}>
           <div>
             Showing <strong style={{ color: 'var(--text-main)' }}>{logs.length}</strong> of{' '}
             <strong style={{ color: 'var(--text-main)' }}>{pagination.total}</strong> records
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
@@ -434,10 +435,10 @@ export default function Logs({ selectedRoomId = '', onSelectRoom, onSwitchToUser
               style={{ opacity: page <= 1 ? 0.4 : 1 }}
             >
               <ChevronLeft size={14} />
-              <span>Previous</span>
+              <span>Prev</span>
             </button>
 
-            <span>
+            <span style={{ fontSize: 12 }}>
               Page <strong style={{ color: 'var(--text-main)' }}>{page}</strong> of {pagination.totalPages || 1}
             </span>
 

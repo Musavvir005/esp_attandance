@@ -128,13 +128,13 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
   const namedCount = users.length - pendingCount;
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
+    <div className="page-container">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 14 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <UsersIcon size={24} color="var(--accent-indigo)" />
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <UsersIcon size={22} color="var(--accent-indigo)" />
+            <h1 style={{ fontSize: 'clamp(18px, 3.5vw, 22px)', fontWeight: 800, color: 'var(--text-main)' }}>
               {currentRoom ? `${currentRoom.name} — User Directory` : 'Biometric User Directory'}
             </h1>
             {currentRoom && (
@@ -150,14 +150,14 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {currentRoom && onSwitchToLogs && (
             <button
               onClick={onSwitchToLogs}
               className="btn btn-secondary btn-sm"
               title={`View access history for ${currentRoom.name}`}
             >
-              <span>{currentRoom.name} Access Logs</span>
+              <span>{currentRoom.name} Logs</span>
             </button>
           )}
 
@@ -167,32 +167,32 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
               setPrefillModalOpen(true);
             }}
             className="btn btn-secondary btn-sm"
-            style={{ padding: '8px 14px' }}
+            style={{ padding: '7px 12px' }}
             title="Pre-fill a range of slots (e.g. 1 to 10) as Unknown Users"
           >
-            <Sparkles size={15} color="var(--accent-cyan)" />
+            <Sparkles size={14} color="var(--accent-cyan)" />
             <span>Pre-fill Slots</span>
           </button>
 
           <button
             onClick={handleOpenAddModal}
             className="btn btn-primary btn-sm"
-            style={{ padding: '8px 16px' }}
+            style={{ padding: '7px 14px' }}
           >
-            <UserPlus size={15} />
+            <UserPlus size={14} />
             <span>{currentRoom ? `Add Slot (${currentRoom.name})` : 'Map Slot'}</span>
           </button>
         </div>
       </div>
 
       {/* Filter and Hardware Summary Bar */}
-      <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Filter size={16} color="var(--text-dim)" />
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Room:</span>
+      <div className="glass-panel" style={{ padding: '14px clamp(12px, 2.5vw, 18px)', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <Filter size={15} color="var(--text-dim)" />
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>Room:</span>
           {currentRoom ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="mono-tag" style={{ fontSize: 13, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span className="mono-tag" style={{ fontSize: 12, padding: '4px 10px', color: 'var(--text-main)', background: 'rgba(56, 189, 248, 0.15)', borderColor: 'var(--accent-cyan)' }}>
                 {currentRoom.name} {currentRoom.location ? `(${currentRoom.location})` : ''}
               </span>
               <button 
@@ -200,13 +200,13 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                 className="btn btn-secondary btn-sm"
                 style={{ fontSize: 11, padding: '3px 8px' }}
               >
-                View All Rooms
+                All Rooms
               </button>
             </div>
           ) : (
             <select
               className="input"
-              style={{ width: 220, fontSize: 13 }}
+              style={{ width: 'auto', minWidth: 180, fontSize: 13, padding: '6px 10px' }}
               value={selectedDevice}
               onChange={(e) => setSelectedDevice(e.target.value)}
             >
@@ -227,14 +227,14 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: 'var(--text-dim)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'var(--text-dim)', flexWrap: 'wrap' }}>
           <div>
-            Total Slots in {currentRoom ? currentRoom.name : 'System'}: <strong style={{ color: 'var(--text-main)' }}>{users.length}</strong>
+            Slots: <strong style={{ color: 'var(--text-main)' }}>{users.length}</strong>
           </div>
           {pendingCount > 0 && (
-            <div style={{ color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#fbbf24' }}></span>
-              <span>Pending Names: <strong>{pendingCount}</strong></span>
+            <div style={{ color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#fbbf24' }}></span>
+              <span>Pending: <strong>{pendingCount}</strong></span>
             </div>
           )}
           {namedCount > 0 && (
@@ -243,7 +243,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
             </div>
           )}
           <div>
-            Capacity: <strong style={{ color: 'var(--text-muted)' }}>127 Slots/Unit</strong>
+            Cap: <strong style={{ color: 'var(--text-muted)' }}>127/Unit</strong>
           </div>
         </div>
       </div>
@@ -254,12 +254,12 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
           <table>
             <thead>
               <tr>
-                <th style={{ width: 140 }}>Fixed Slot (ID)</th>
+                <th style={{ width: 130 }}>Slot (ID)</th>
                 <th>Assigned Name</th>
                 <th>Associated Room Unit</th>
                 <th>Role</th>
                 <th>Enrolled Date &amp; Time</th>
-                <th style={{ textAlign: 'right', width: 100 }}>Action</th>
+                <th style={{ textAlign: 'right', width: 90 }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -271,7 +271,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                   <tr
                     key={user.id}
                     onClick={() => { setEditingUser(user); setModalOpen(true); }}
-                    title="Click to change name or settings (Slot ID is fixed)"
+                    title="Click to edit name or settings"
                     style={{ 
                       cursor: 'pointer', 
                       userSelect: 'none',
@@ -279,9 +279,9 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                     }}
                   >
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Fingerprint size={16} color="var(--accent-cyan)" />
-                        <span className="mono-tag" style={{ fontSize: 13, fontWeight: 700 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Fingerprint size={15} color="var(--accent-cyan)" />
+                        <span className="mono-tag" style={{ fontSize: 12, fontWeight: 700 }}>
                           #{user.fingerprint_id}
                         </span>
                       </div>
@@ -291,7 +291,7 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <span style={{ 
                           fontWeight: 700, 
-                          fontSize: 14, 
+                          fontSize: 13.5, 
                           color: isUnknown ? '#fbbf24' : 'var(--text-main)' 
                         }}>
                           {user.name}
@@ -303,37 +303,37 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                               background: 'rgba(245, 158, 11, 0.12)', 
                               color: '#fbbf24', 
                               border: '1px solid rgba(245, 158, 11, 0.3)', 
-                              fontSize: 10, 
-                              padding: '2px 7px',
+                              fontSize: 9, 
+                              padding: '1px 6px',
                               letterSpacing: 0.5
                             }}
                           >
                             NAME PENDING
                           </span>
                         ) : (
-                          <Pencil size={12} color="var(--text-dim)" style={{ opacity: 0.4, flexShrink: 0 }} />
+                          <Pencil size={11} color="var(--text-dim)" style={{ opacity: 0.4, flexShrink: 0 }} />
                         )}
                       </div>
                     </td>
 
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Cpu size={14} color="var(--text-dim)" />
-                        <strong style={{ color: 'var(--text-muted)' }}>{user.device_name || `Unit #${user.device_id}`}</strong>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <Cpu size={13} color="var(--text-dim)" />
+                        <strong style={{ color: 'var(--text-muted)', fontSize: 13 }}>{user.device_name || `Unit #${user.device_id}`}</strong>
                       </div>
                     </td>
 
                     <td>
                       {user.role === 'admin' || user.fingerprint_id <= 3 ? (
-                        <span className="badge badge-admin">Administrator</span>
+                        <span className="badge badge-admin">Admin</span>
                       ) : (
                         <span className="badge badge-member">Member</span>
                       )}
                     </td>
 
                     <td>
-                      <div style={{ lineHeight: 1.6 }}>
-                        <span style={{ fontSize: 13, color: 'var(--text-muted)', display: 'block' }}>
+                      <div style={{ lineHeight: 1.5 }}>
+                        <span style={{ fontSize: 12.5, color: 'var(--text-muted)', display: 'block' }}>
                           {enrolled.date}
                         </span>
                         <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'monospace' }}>
@@ -356,10 +356,10 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
 
               {users.length === 0 && !loading && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: 48, color: 'var(--text-dim)' }}>
-                    <p style={{ marginBottom: 12 }}>No fingerprint slots detected or enrolled yet for this room.</p>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
+                    <p style={{ marginBottom: 8 }}>No fingerprint slots enrolled yet for this room.</p>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      Slots are created automatically as <strong>Unknown User</strong> as soon as a finger is scanned, or you can click <strong>"Pre-fill Slots"</strong> to generate slots 1 to 10 immediately.
+                      Slots are created automatically as <strong>Unknown User</strong> upon scanning, or click <strong>"Pre-fill Slots"</strong>.
                     </p>
                   </td>
                 </tr>
@@ -385,18 +385,18 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
       {prefillModalOpen && (
         <div className="modal-overlay" onClick={() => setPrefillModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Sparkles size={22} color="var(--accent-cyan)" />
-                <h3 style={{ fontSize: 18, fontWeight: 700 }}>Pre-fill Unknown User Slots</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Sparkles size={20} color="var(--accent-cyan)" />
+                <h3 style={{ fontSize: 17, fontWeight: 700 }}>Pre-fill Unknown User Slots</h3>
               </div>
               <button onClick={() => setPrefillModalOpen(false)} className="btn btn-secondary btn-sm" style={{ padding: 6 }}>
-                <X size={16} />
+                <X size={15} />
               </button>
             </div>
 
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-              Pre-populates hardware slot IDs (e.g. 1 to 10) as <strong>Unknown User #1</strong> ... <strong>Unknown User #10</strong>. Their IDs will remain fixed, and you can assign real names to each person at any time.
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
+              Pre-populates hardware slot IDs (e.g. 1 to 10) as <strong>Unknown User #1</strong> ... <strong>Unknown User #10</strong>.
             </p>
 
             {prefillMessage && (
@@ -407,15 +407,15 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                 padding: '10px 14px', 
                 borderRadius: 'var(--radius-md)', 
                 fontSize: 13, 
-                marginBottom: 16 
+                marginBottom: 14 
               }}>
                 {prefillMessage}
               </div>
             )}
 
             <form onSubmit={handlePrefillSubmit}>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>
                   Target Room Unit
                 </label>
                 <select 
@@ -430,8 +430,8 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                 </select>
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+              <div style={{ marginBottom: 18 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>
                   Number of Slots (e.g. 10 users = slots 1 to 10)
                 </label>
                 <input 
@@ -443,17 +443,14 @@ export default function Users({ selectedRoomId = '', onSelectRoom, onSwitchToLog
                   onChange={(e) => setPrefillCount(e.target.value)}
                   required
                 />
-                <span style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4, display: 'block' }}>
-                  Existing slots won't be overwritten. Any new slots will be added as "Unknown User #ID".
-                </span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap' }}>
                 <button type="button" onClick={() => setPrefillModalOpen(false)} className="btn btn-secondary">
                   Cancel
                 </button>
                 <button type="submit" disabled={prefillLoading} className="btn btn-primary">
-                  {prefillLoading ? 'Creating Slots...' : `Generate Slots 1 to ${prefillCount || 10}`}
+                  {prefillLoading ? 'Creating...' : `Generate 1 to ${prefillCount || 10}`}
                 </button>
               </div>
             </form>

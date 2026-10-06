@@ -5,15 +5,13 @@ import {
   Cpu, 
   Activity, 
   Clock, 
-  Key, 
   Code, 
   ShieldCheck, 
   Users, 
   History,
-  RefreshCw, 
   CheckCircle2, 
   AlertCircle,
-  Layers
+  MapPin
 } from 'lucide-react';
 import { api } from '../api';
 import FirmwareModal from '../components/FirmwareModal';
@@ -124,135 +122,85 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
     }
   };
 
-  // Filter devices if a specific room is selected
   const visibleDevices = selectedRoomId
     ? devices.filter((d) => String(d.id) === String(selectedRoomId))
     : devices;
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
-      {/* Room Selection Pills */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 24,
-        overflowX: 'auto',
-        paddingBottom: 4,
-      }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginRight: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Layers size={14} color="var(--accent-cyan)" /> Room Scope:
-        </span>
-        <button
-          onClick={() => onSelectRoom('')}
-          className="btn btn-sm"
-          style={{
-            background: !selectedRoomId ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-            color: !selectedRoomId ? 'var(--accent-cyan)' : 'var(--text-muted)',
-            borderColor: !selectedRoomId ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-          }}
-        >
-          All Units ({devices.length})
-        </button>
-        {devices.map((d) => (
-          <button
-            key={d.id}
-            onClick={() => onSelectRoom(String(d.id))}
-            className="btn btn-sm"
-            style={{
-              background: String(selectedRoomId) === String(d.id) ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-              color: String(selectedRoomId) === String(d.id) ? 'var(--accent-cyan)' : 'var(--text-muted)',
-              borderColor: String(selectedRoomId) === String(d.id) ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-            }}
-          >
-            <span className={`status-dot ${d.is_online ? 'online' : 'offline'}`} style={{ width: 6, height: 6 }} />
-            <span>{d.name}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Top Stat Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: 16,
-        marginBottom: 32,
-      }}>
-        <div className="glass-panel" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+    <div className="page-container">
+      {/* Top 2x2 on Mobile / 4-Column on Desktop Stat Cards */}
+      <div className="stats-grid">
+        <div className="glass-panel" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Scans Today
             </span>
-            <Activity size={18} color="var(--accent-cyan)" />
+            <Activity size={15} color="var(--accent-cyan)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>
             {stats?.today_scans || 0}
           </div>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Multi-room biometric events</span>
+          <span style={{ fontSize: 10.5, color: 'var(--text-dim)', display: 'block', marginTop: 2 }}>Biometric scans</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Hardware Units
+        <div className="glass-panel" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Units Online
             </span>
-            <Cpu size={18} color="var(--accent-emerald)" />
+            <Cpu size={15} color="var(--accent-emerald)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>
             {stats?.online_devices || 0}
-            <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dim)', marginLeft: 6 }}>
-              / {stats?.total_devices || 0} online
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-dim)', marginLeft: 4 }}>
+              / {stats?.total_devices || 0}
             </span>
           </div>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Isolated ESP32 room controllers</span>
+          <span style={{ fontSize: 10.5, color: 'var(--text-dim)', display: 'block', marginTop: 2 }}>Connected ESP32s</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+        <div className="glass-panel" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Enrolled Users
             </span>
-            <Users size={18} color="var(--accent-indigo)" />
+            <Users size={15} color="var(--accent-indigo)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>
             {stats?.active_users || 0}
           </div>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Mapped across all doors</span>
+          <span style={{ fontSize: 10.5, color: 'var(--text-dim)', display: 'block', marginTop: 2 }}>Registered slots</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+        <div className="glass-panel" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Pending Unlocks
             </span>
-            <Lock size={18} color="var(--accent-amber)" />
+            <Lock size={15} color="var(--accent-amber)" />
           </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={{ fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>
             {stats?.pending_unlocks || 0}
           </div>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Queued in-flight commands</span>
+          <span style={{ fontSize: 10.5, color: 'var(--text-dim)', display: 'block', marginTop: 2 }}>In-flight signals</span>
         </div>
       </div>
 
-      {/* Main Grid: Control Station + Activity Stream */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
-        gap: 24,
-      }}>
+      {/* Main Adaptive Grid: Control Station + Activity Stream */}
+      <div className="dashboard-main-grid">
         {/* Left Column: Device Control Cards */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Lock size={20} color="var(--accent-cyan)" />
-              {selectedRoomId ? 'Selected Room Door Control' : 'All Rooms Access & Unlock Station'}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 6 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-main)' }}>
+              <Lock size={16} color="var(--accent-cyan)" />
+              {selectedRoomId ? 'Room Door Controls' : 'Door Units & Relay Stations'}
             </h2>
-            <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-              ESP32 polls every 0.5–2.0s
+            <span style={{ fontSize: 10.5, color: 'var(--text-dim)' }}>
+              ESP32 polling live
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {visibleDevices.map((device) => {
               const uState = unlockStates[device.id] || { status: 'idle', countdown: 0 };
               const isDispatched = uState.status === 'dispatched';
@@ -264,154 +212,137 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
                   key={device.id}
                   className="glass-panel"
                   style={{
-                    padding: '24px',
+                    padding: '16px clamp(12px, 3vw, 20px)',
                     borderColor: isUnlocked
                       ? 'var(--accent-emerald)'
                       : isDispatched
                       ? 'var(--accent-cyan)'
                       : undefined,
                     boxShadow: isUnlocked
-                      ? '0 0 30px rgba(16, 185, 129, 0.25)'
+                      ? '0 0 24px rgba(16, 185, 129, 0.25)'
                       : undefined,
                     transition: 'all 0.3s ease',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
                         <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} />
-                        <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>
                           {device.name}
                         </h3>
-                        <span className="mono-tag" style={{ fontSize: 11 }}>
+                        <span className="mono-tag" style={{ fontSize: 10 }}>
                           DIR: {device.name}
                         </span>
                       </div>
                       {device.location && device.location.trim() && (
-                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                          {device.location}
+                        <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <MapPin size={11} color="var(--text-dim)" />
+                          <span>{device.location}</span>
                         </p>
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
                       <button
                         onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'logs')}
                         className="btn btn-secondary btn-sm"
-                        style={{ fontSize: 11, padding: '5px 10px' }}
-                        title={`View Access Logs for ${device.name}`}
+                        style={{ padding: '4px 8px', fontSize: 11 }}
+                        title="View access logs"
                       >
-                        <History size={12} color="var(--accent-cyan)" />
+                        <History size={12} />
                         <span>Logs</span>
                       </button>
                       <button
                         onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'users')}
                         className="btn btn-secondary btn-sm"
-                        style={{ fontSize: 11, padding: '5px 10px' }}
-                        title={`View User Directory for ${device.name}`}
+                        style={{ padding: '4px 8px', fontSize: 11 }}
+                        title="Manage enrolled users"
                       >
-                        <Users size={12} color="var(--accent-indigo)" />
-                        <span>Users</span>
+                        <Users size={12} />
+                        <span>Users ({device.user_count || 0})</span>
                       </button>
                       <button
                         onClick={() => setActiveFirmwareDevice(device)}
                         className="btn btn-secondary btn-sm"
-                        style={{ padding: '5px 10px', fontSize: 11 }}
-                        title="View Arduino / ESP32 Configuration Code"
+                        style={{ padding: '4px 8px', fontSize: 11 }}
+                        title="View ESP32 sketch code constants"
                       >
                         <Code size={12} />
-                        <span>Firmware</span>
+                        <span>Code</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Device Meta Info */}
+                  {/* Remote Unlock Trigger Bar */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 20,
-                    fontSize: 12,
-                    color: 'var(--text-dim)',
-                    padding: '10px 14px',
-                    background: 'rgba(0, 0, 0, 0.25)',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
                     borderRadius: 'var(--radius-md)',
-                    marginBottom: 20,
+                    background: isUnlocked
+                      ? 'rgba(16, 185, 129, 0.12)'
+                      : isDispatched
+                      ? 'rgba(56, 189, 248, 0.1)'
+                      : isTimeout
+                      ? 'rgba(244, 63, 94, 0.1)'
+                      : 'rgba(15, 23, 42, 0.4)',
+                    border: '1px solid',
+                    borderColor: isUnlocked
+                      ? 'rgba(16, 185, 129, 0.3)'
+                      : isDispatched
+                      ? 'rgba(56, 189, 248, 0.3)'
+                      : isTimeout
+                      ? 'rgba(244, 63, 94, 0.3)'
+                      : 'var(--border-subtle)',
+                    gap: 10,
+                    flexWrap: 'wrap',
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Clock size={14} />
-                      <span>
-                        Last poll:{' '}
-                        {device.last_seen_at
-                          ? new Date(device.last_seen_at).toLocaleTimeString()
-                          : 'Never'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Users size={14} />
-                      <span>{device.user_count || 0} Enrolled Fingerprints</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                      <Key size={14} />
-                      <span className="mono-tag" style={{ fontSize: 11 }}>
-                        {device.secret_key.slice(0, 10)}•••••
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action Bar */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                      {isUnlocked && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-emerald)', fontWeight: 700 }}>
-                          <CheckCircle2 size={18} />
-                          <span>DOOR UNLOCKED — RELOCKING IN {uState.countdown}s</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 7,
+                        background: isUnlocked ? 'var(--accent-emerald)' : isDispatched ? 'var(--accent-cyan)' : 'rgba(255,255,255,0.06)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: isUnlocked || isDispatched ? '#fff' : 'var(--text-muted)',
+                        flexShrink: 0,
+                      }}>
+                        {isUnlocked ? <Unlock size={16} /> : <Lock size={16} />}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 12.5, fontWeight: 700, color: isUnlocked ? 'var(--accent-emerald)' : 'var(--text-main)' }}>
+                          {isUnlocked ? `UNLOCKED (${uState.countdown}s)` : isDispatched ? 'Signaling ESP32...' : isTimeout ? 'Timed Out' : 'Door Secured'}
                         </div>
-                      )}
-                      {isDispatched && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                          <RefreshCw size={16} className="unlocking-active" />
-                          <span>DISPATCHED TO QUEUE — WAITING FOR {device.name} TO POLL...</span>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-dim)' }}>
+                          {device.is_online ? 'Relay ready' : 'Unit offline'}
                         </div>
-                      )}
-                      {isTimeout && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-amber)', fontSize: 13 }}>
-                          <AlertCircle size={16} />
-                          <span>Unit took longer than 15s to poll. Is {device.name} powered?</span>
-                        </div>
-                      )}
-                      {!isUnlocked && !isDispatched && !isTimeout && (
-                        <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-                          Clicking unlock targets <strong style={{ color: 'var(--accent-cyan)' }}>{device.name} only</strong> and never impacts other rooms.
-                        </span>
-                      )}
+                      </div>
                     </div>
 
                     <button
                       onClick={() => handleRemoteUnlock(device)}
                       disabled={isDispatched || isUnlocked}
                       className="btn btn-unlock"
-                      style={{
-                        padding: '12px 28px',
-                        fontSize: 15,
-                        background: isUnlocked
-                          ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
-                          : undefined,
-                      }}
+                      style={{ padding: '7px 14px', fontSize: 12.5 }}
                     >
-                      {isUnlocked ? (
+                      {isDispatched ? (
                         <>
-                          <Unlock size={18} />
-                          <span>OPEN ({uState.countdown}s)</span>
+                          <Clock size={13} className="unlocking-active" />
+                          <span>Signaling...</span>
                         </>
-                      ) : isDispatched ? (
+                      ) : isUnlocked ? (
                         <>
-                          <RefreshCw size={18} className="unlocking-active" />
-                          <span>DISPATCHING...</span>
+                          <CheckCircle2 size={13} />
+                          <span>Unlocked ({uState.countdown}s)</span>
                         </>
                       ) : (
                         <>
-                          <Unlock size={18} />
-                          <span>UNLOCK {device.name}</span>
+                          <Unlock size={13} />
+                          <span>Unlock Now</span>
                         </>
                       )}
                     </button>
@@ -420,68 +351,95 @@ export default function Dashboard({ stats, onRefreshStats, selectedRoomId, onSel
               );
             })}
 
-            {visibleDevices.length === 0 && !loading && (
-              <div className="glass-panel" style={{ padding: 32, textAlign: 'center' }}>
-                <Cpu size={36} color="var(--text-dim)" style={{ marginBottom: 12 }} />
-                <h3 style={{ fontSize: 16, fontWeight: 700 }}>No Devices Match Selection</h3>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                  Add your first room unit under the Hardware & Keys tab.
+            {visibleDevices.length === 0 && (
+              <div className="glass-panel" style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)' }}>
+                <Cpu size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
+                <h3 style={{ fontSize: 15 }}>No Door Units Found</h3>
+                <p style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>
+                  Add a room in the "Hardware" tab or click "+ Add" above.
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Column: Live Event Stream */}
+        {/* Right Column: Live Biometric Scan Stream */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Activity size={20} color="var(--accent-emerald)" />
-              {selectedRoomId ? 'Room Scans' : 'Live Multi-Room Scans'}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-main)' }}>
+              <History size={16} color="var(--accent-indigo)" />
+              Recent Scans
             </h2>
-            <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Auto-updating</span>
+            <span style={{ fontSize: 10.5, color: 'var(--text-dim)' }}>
+              Live
+            </span>
           </div>
 
-          <div className="glass-panel" style={{ padding: 16 }}>
-            {recentLogs.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {recentLogs.map((log) => (
+          <div className="glass-panel" style={{ padding: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {recentLogs.map((log) => {
+                const isAdmin = (log.user_role || '').toLowerCase() === 'admin';
+                const isUnknown = !log.user_name || log.user_name.toLowerCase().startsWith('unknown');
+
+                return (
                   <div
                     key={log.id}
                     style={{
-                      padding: '12px',
-                      background: 'rgba(0, 0, 0, 0.25)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid rgba(255, 255, 255, 0.04)',
+                      padding: '8px 10px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                      fontSize: 12,
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>
-                        {log.user_name || `Unknown ID #${log.fingerprint_id}`}
-                      </span>
-                      <span className="mono-tag" style={{ fontSize: 10 }}>
-                        FP #{log.fingerprint_id}
-                      </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      <div style={{
+                        width: 26,
+                        height: 26,
+                        borderRadius: 6,
+                        background: isAdmin ? 'rgba(99, 102, 241, 0.2)' : isUnknown ? 'rgba(244, 63, 94, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: isAdmin ? 'var(--accent-indigo)' : isUnknown ? 'var(--accent-rose)' : 'var(--accent-cyan)',
+                        flexShrink: 0,
+                      }}>
+                        <ShieldCheck size={14} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {log.user_name || `Unknown ID #${log.fingerprint_id}`}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span className="mono-tag" style={{ fontSize: 9, padding: '0 3px' }}>FP #{log.fingerprint_id}</span>
+                          <span>•</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{log.device_name}</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-dim)' }}>
-                      <span>Room: <strong style={{ color: 'var(--accent-cyan)' }}>{log.device_name || log.dir}</strong></span>
-                      <span>
-                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                      </span>
+                    <div style={{ textAlign: 'right', flexShrink: 0, fontSize: 10.5, color: 'var(--text-dim)' }}>
+                      <div>{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-dim)', fontSize: 13 }}>
-                No scan events recorded for this room yet.
-              </div>
-            )}
+                );
+              })}
+
+              {recentLogs.length === 0 && (
+                <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-dim)', fontSize: 12 }}>
+                  No scans recorded recently
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Firmware Modal */}
       {activeFirmwareDevice && (
         <FirmwareModal
           device={activeFirmwareDevice}

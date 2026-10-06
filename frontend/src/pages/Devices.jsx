@@ -6,9 +6,9 @@ import {
   Trash2, 
   Code, 
   MapPin, 
-  Clock,
-  History,
-  Users
+  Clock, 
+  History, 
+  Users 
 } from 'lucide-react';
 import { api } from '../api';
 import DeviceModal from '../components/DeviceModal';
@@ -63,12 +63,12 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
   };
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 1300, margin: '0 auto' }}>
+    <div className="page-container">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 14 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Cpu size={24} color="var(--accent-cyan)" />
+          <h1 style={{ fontSize: 'clamp(18px, 3.5vw, 22px)', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Cpu size={22} color="var(--accent-cyan)" />
             Door Units &amp; Rooms
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
@@ -79,35 +79,31 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
         <button
           onClick={() => { setEditingDevice(null); setModalOpen(true); }}
           className="btn btn-primary"
-          style={{ padding: '10px 18px' }}
+          style={{ padding: '8px 16px', fontSize: 13 }}
         >
-          <Plus size={16} />
+          <Plus size={15} />
           <span>Add Door Unit</span>
         </button>
       </div>
 
-      {/* Device Cards Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-        gap: 20,
-      }}>
+      {/* Responsive Device Cards Grid */}
+      <div className="devices-grid">
         {devices.map((device) => (
-          <div key={device.id} className="glass-panel" style={{ padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+          <div key={device.id} className="glass-panel" style={{ padding: '18px clamp(14px, 3vw, 22px)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, gap: 10 }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span className={`status-dot ${device.is_online ? 'online' : 'offline'}`} />
-                  <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)' }}>
                     {device.name}
                   </h3>
-                  <span className={`badge ${device.is_online ? 'badge-active' : 'badge-inactive'}`}>
+                  <span className={`badge ${device.is_online ? 'badge-active' : 'badge-inactive'}`} style={{ fontSize: 9 }}>
                     {device.is_online ? 'ONLINE' : 'OFFLINE'}
                   </span>
                 </div>
                 {device.location && device.location.trim() && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                    <MapPin size={13} color="var(--text-dim)" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                    <MapPin size={12} color="var(--text-dim)" />
                     <span>{device.location}</span>
                   </div>
                 )}
@@ -117,41 +113,42 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
                 onClick={() => setFirmwareDevice(device)}
                 className="btn btn-secondary btn-sm"
                 title="View ESP32 C++ Sketch Constants"
+                style={{ padding: '5px 8px', fontSize: 11 }}
               >
-                <Code size={13} />
+                <Code size={12} />
                 <span>Firmware</span>
               </button>
             </div>
 
             {/* Last Seen & Stats */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-dim)', margin: '18px 0', background: 'rgba(0,0,0,0.25)', padding: '10px 14px', borderRadius: 'var(--radius-md)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Clock size={13} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11.5, color: 'var(--text-dim)', margin: '14px 0', background: 'rgba(0,0,0,0.2)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', flexWrap: 'wrap', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Clock size={12} />
                 <span>
-                  Last Seen: <strong style={{ color: 'var(--text-muted)' }}>{device.last_seen_at ? new Date(device.last_seen_at).toLocaleTimeString() : 'Never'}</strong>
+                  Seen: <strong style={{ color: 'var(--text-muted)' }}>{device.last_seen_at ? new Date(device.last_seen_at).toLocaleTimeString() : 'Never'}</strong>
                 </span>
               </div>
               <div>
-                <strong style={{ color: 'var(--accent-cyan)' }}>{device.user_count || 0}</strong> Registered Users
+                <strong style={{ color: 'var(--accent-cyan)' }}>{device.user_count || 0}</strong> Users
               </div>
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 14, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 12, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button
                   onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'logs')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: 11, padding: '5px 10px' }}
+                  style={{ fontSize: 11, padding: '4px 8px' }}
                   title={`Open Access Logs for ${device.name}`}
                 >
                   <History size={12} color="var(--accent-cyan)" />
-                  <span>Access Logs</span>
+                  <span>Logs</span>
                 </button>
                 <button
                   onClick={() => onNavigateToRoom && onNavigateToRoom(device.id, 'users')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: 11, padding: '5px 10px' }}
+                  style={{ fontSize: 11, padding: '4px 8px' }}
                   title={`Open User Directory for ${device.name}`}
                 >
                   <Users size={12} color="var(--accent-indigo)" />
@@ -163,7 +160,7 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
                 <button
                   onClick={() => { setEditingDevice(device); setModalOpen(true); }}
                   className="btn btn-secondary btn-sm"
-                  style={{ padding: '5px 8px' }}
+                  style={{ padding: '4px 8px' }}
                   title="Edit Room Details"
                 >
                   <Edit3 size={13} />
@@ -171,7 +168,7 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
                 <button
                   onClick={() => handleDeleteDevice(device)}
                   className="btn btn-danger btn-sm"
-                  style={{ padding: '5px 8px' }}
+                  style={{ padding: '4px 8px' }}
                   title="Delete Room Unit"
                 >
                   <Trash2 size={13} />
@@ -183,10 +180,10 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
 
         {devices.length === 0 && !loading && (
           <div className="glass-panel" style={{ padding: 40, textAlign: 'center', gridColumn: '1 / -1' }}>
-            <Cpu size={40} color="var(--text-dim)" style={{ marginBottom: 12 }} />
+            <Cpu size={36} color="var(--text-dim)" style={{ marginBottom: 12 }} />
             <h3 style={{ fontSize: 16, fontWeight: 700 }}>No Rooms Registered</h3>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-              Add your first room unit or simply turn on your ESP32 board to auto-register.
+              Add your first room unit or turn on your ESP32 board to auto-register.
             </p>
           </div>
         )}
@@ -209,4 +206,3 @@ export default function Devices({ onDevicesUpdated, onNavigateToRoom }) {
     </div>
   );
 }
-
